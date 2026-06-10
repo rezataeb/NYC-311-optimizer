@@ -1,0 +1,4 @@
+interface:
+  display_name: "Gather"
+  short_description: "Merge delegated Codex worktrees"
+  default_prompt: "Use $gather to collect delegated Codex worktrees and merge them back into the base branch."

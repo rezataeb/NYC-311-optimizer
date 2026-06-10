@@ -1,0 +1,4 @@
+interface:
+  display_name: "Delegate"
+  short_description: "Split work into Codex worktrees"
+  default_prompt: "Use $delegate to split this implementation into parallel Codex worktree threads."
