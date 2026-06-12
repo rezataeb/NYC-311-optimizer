@@ -523,8 +523,6 @@
     </div>
 
     <script type="module">
-      const ANTHROPIC_API_KEY = import.meta.env.VITE_ANTHROPIC_API_KEY;
-
       const SUBMIT_URLS = {
         "HEAT/HOT WATER": "https://portal.311.nyc.gov/article/?kanumber=KA-01036",
         NOISE: "https://portal.311.nyc.gov/article/?kanumber=KA-01198",
@@ -557,10 +555,6 @@
         });
       }
 
-      function stripJsonFences(text) {
-        return text.trim().replace(/^```(?:json)?/i, "").replace(/```$/i, "").trim();
-      }
-
       function submitUrlFor(category = "") {
         const normalized = category.toUpperCase();
         if (SUBMIT_URLS[normalized]) return SUBMIT_URLS[normalized];
@@ -584,37 +578,18 @@
       }
 
       async function optimizeComplaint(input, tone) {
-        const response = await fetch("https://api.anthropic.com/v1/messages", {
+        const response = await fetch("/api/optimize", {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "x-api-key": ANTHROPIC_API_KEY,
-            "anthropic-version": "2023-06-01",
-            "anthropic-dangerous-direct-browser-access": "true"
-          },
-          body: JSON.stringify({
-            model: "claude-haiku-4-5-20251001",
-            max_tokens: 1000,
-            system: "You are an expert NYC 311 advocate. You know every complaint category, every responsible city agency, and the exact language that gets complaints acted on fastest. You always respond in valid JSON only — no preamble, no markdown, no explanation.",
-            messages: [{
-              role: "user",
-              content: `Here is a complaint from an NYC resident: ${input}
-Tone requested: ${tone}
-Return this exact JSON and nothing else:
-{
-  "rewritten": "3-5 sentences, specific and legally grounded",
-  "category": "exact 311 category in ALL CAPS",
-  "agency": "agency acronym e.g. HPD, DOT, DSNY",
-  "agency_full": "full agency name",
-  "legal_note": "one sentence: legal obligation + timeframe",
-  "likelihood": "High or Medium or Low"
-}`
-            }]
-          })
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ input, tone })
         });
 
-        const data = await response.json();
-        const result = JSON.parse(stripJsonFences(data.content[0].text));
+        if (!response.ok) {
+          throw new Error("Something went wrong — try rephrasing your complaint");
+        }
+
+        const result = await response.json();
+        if (result.error) throw new Error("Something went wrong — try rephrasing your complaint");
         return withSubmitUrl(result);
       }
 
