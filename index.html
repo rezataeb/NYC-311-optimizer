@@ -523,6 +523,8 @@
     </div>
 
     <script type="module">
+      const ANTHROPIC_API_KEY = import.meta.env.VITE_ANTHROPIC_API_KEY;
+
       const SUBMIT_URLS = {
         "HEAT/HOT WATER": "https://portal.311.nyc.gov/article/?kanumber=KA-01036",
         NOISE: "https://portal.311.nyc.gov/article/?kanumber=KA-01198",
@@ -533,63 +535,12 @@
       };
 
       const examples = [
-        {
-          input: "My landlord hasn't fixed the heat in 2 weeks, it's freezing",
-          tone: "firm"
-        },
-        {
-          input: "My neighbor plays loud music every night after midnight",
-          tone: "urgent"
-        },
-        {
-          input: "There's a giant pothole on my street that damaged my car",
-          tone: "polite"
-        }
+        { input: "My landlord hasn't fixed the heat in 2 weeks", tone: "firm" },
+        { input: "My neighbor plays loud music every night after midnight", tone: "urgent" },
+        { input: "There's a giant pothole on my street that damaged my car", tone: "polite" }
       ];
 
-      const demoResults = [
-        {
-          rewritten:
-            "My apartment has been without adequate heat for approximately two weeks, despite the landlord having notice of the condition. The indoor temperature is unreasonably cold and may fall below the minimum heat requirements during heat season. I am requesting an HPD inspection and prompt enforcement so the owner restores lawful heat service immediately. Please document this as an ongoing habitability issue affecting tenant health and safety.",
-          category: "HEAT/HOT WATER",
-          agency: "HPD",
-          agency_full: "NYC Housing Preservation & Development",
-          legal_note:
-            "During heat season, landlords must maintain required indoor temperatures and HPD may inspect and issue violations requiring correction, often within 24 hours for immediately hazardous heat conditions.",
-          likelihood: "High"
-        },
-        {
-          rewritten:
-            "There is recurring loud music from a neighboring apartment every night after midnight, disrupting sleep and creating an unreasonable nighttime noise condition. The noise is persistent, occurs during overnight quiet hours, and can be heard clearly inside my residence. I am requesting a noise complaint response and documentation of the repeated after-hours disturbance. Please treat this as an urgent recurring quality-of-life issue.",
-          category: "NOISE",
-          agency: "NYPD",
-          agency_full: "New York City Police Department",
-          legal_note:
-            "NYC noise rules restrict unreasonable residential noise during nighttime hours, and enforcement typically depends on officers witnessing the condition when they respond.",
-          likelihood: "Medium"
-        },
-        {
-          rewritten:
-            "There is a large pothole on my street that appears deep enough to create a hazard for vehicles and cyclists. My vehicle was damaged after striking it, and I am concerned that additional drivers may be affected if it is not repaired. Please inspect the roadway condition and schedule repair or make-safe work as appropriate. I would appreciate documentation of the defect and any repair timeline.",
-          category: "STREET/SIDEWALK",
-          agency: "DOT",
-          agency_full: "NYC Department of Transportation",
-          legal_note:
-            "DOT is responsible for inspecting reported street defects and prioritizing roadway repairs based on location, severity, and safety risk.",
-          likelihood: "High"
-        }
-      ];
-
-      const state = {
-        input: "",
-        tone: "firm",
-        loading: false,
-        result: null,
-        error: null
-      };
-
-      const systemPrompt =
-        "You are an expert NYC 311 advocate. You know every complaint category, every responsible city agency, and the exact language that gets complaints acted on fastest. You always respond in valid JSON only — no preamble, no markdown, no explanation.";
+      const state = { tone: "firm", loading: false };
 
       const inputEl = document.querySelector("#complaint-input");
       const formEl = document.querySelector("#complaint-form");
@@ -599,40 +550,15 @@
       const countEl = document.querySelector("#result-count");
       const toneButtons = Array.from(document.querySelectorAll(".tone-button"));
 
-      const getOpenAIKey = () =>
-        window.OPENAI_API_KEY ||
-        localStorage.getItem("OPENAI_API_KEY") ||
-        new URLSearchParams(window.location.search).get("key") ||
-        "";
-
       function setTone(tone) {
         state.tone = tone;
-        toneButtons.forEach((button) => {
-          button.setAttribute("aria-pressed", String(button.dataset.tone === tone));
+        toneButtons.forEach((btn) => {
+          btn.setAttribute("aria-pressed", String(btn.dataset.tone === tone));
         });
       }
 
-      function userPrompt(input, tone) {
-        return `Here is a complaint from an NYC resident: ${input}
-Tone requested: ${tone}
-
-Return this exact JSON and nothing else:
-{
-  'rewritten': 'the optimized complaint in ${tone} tone, specific and legally grounded, 3-5 sentences',
-  'category': 'exact 311 category name in ALL CAPS',
-  'agency': 'agency acronym e.g. HPD, DOT, DSNY, DEP, FDNY',
-  'agency_full': 'full agency name',
-  'legal_note': 'one sentence: what the agency or landlord is legally required to do and within what timeframe',
-  'likelihood': 'High or Medium or Low — based on how actionable this complaint type typically is'
-}`;
-      }
-
       function stripJsonFences(text) {
-        return text
-          .trim()
-          .replace(/^```(?:json)?/i, "")
-          .replace(/```$/i, "")
-          .trim();
+        return text.trim().replace(/^```(?:json)?/i, "").replace(/```$/i, "").trim();
       }
 
       function submitUrlFor(category = "") {
@@ -641,9 +567,7 @@ Return this exact JSON and nothing else:
         if (normalized.includes("HEAT") || normalized.includes("HOT WATER")) return SUBMIT_URLS["HEAT/HOT WATER"];
         if (normalized.includes("NOISE")) return SUBMIT_URLS.NOISE;
         if (normalized.includes("SANITATION") || normalized.includes("TRASH")) return SUBMIT_URLS.SANITATION;
-        if (normalized.includes("STREET") || normalized.includes("SIDEWALK") || normalized.includes("POTHOLE")) {
-          return SUBMIT_URLS["STREET/SIDEWALK"];
-        }
+        if (normalized.includes("STREET") || normalized.includes("SIDEWALK") || normalized.includes("POTHOLE")) return SUBMIT_URLS["STREET/SIDEWALK"];
         if (normalized.includes("CONSTRUCTION")) return SUBMIT_URLS.CONSTRUCTION;
         return SUBMIT_URLS.DEFAULT;
       }
@@ -659,101 +583,49 @@ Return this exact JSON and nothing else:
         };
       }
 
-      function timeoutAfter(ms) {
-        return new Promise((_, reject) => {
-          window.setTimeout(() => reject(new Error("timeout")), ms);
-        });
-      }
-
-      function fallbackFor(input, tone) {
-        const lower = input.toLowerCase();
-        if (lower.includes("heat") || lower.includes("hot water") || lower.includes("landlord")) {
-          return withSubmitUrl({
-            ...demoResults[0],
-            rewritten:
-              tone === "polite"
-                ? "My apartment has been without reliable heat or hot water, and I would appreciate an HPD inspection to help resolve the condition. The landlord has been made aware, but the service has not been restored. This is affecting basic habitability and tenant safety. Please document the condition and require the owner to make the necessary repairs."
-                : demoResults[0].rewritten
-          });
-        }
-        if (lower.includes("noise") || lower.includes("music") || lower.includes("neighbor")) {
-          return withSubmitUrl(demoResults[1]);
-        }
-        if (lower.includes("pothole") || lower.includes("street") || lower.includes("sidewalk")) {
-          return withSubmitUrl(demoResults[2]);
-        }
-        if (lower.includes("trash") || lower.includes("garbage") || lower.includes("rats")) {
-          return withSubmitUrl({
-            rewritten:
-              "There is an ongoing sanitation condition at this location involving accumulated trash or refuse that may attract pests and create a public health concern. The condition has not been corrected and needs inspection or enforcement by the responsible agency. Please document the location, require cleanup, and take any appropriate enforcement action. This complaint is specific, observable, and time-sensitive.",
-            category: "SANITATION",
-            agency: "DSNY",
-            agency_full: "NYC Department of Sanitation",
-            legal_note:
-              "Property owners and businesses must keep sidewalks and refuse areas clean, and DSNY can issue summonses or require cleanup for verified sanitation violations.",
-            likelihood: "High"
-          });
-        }
-        return withSubmitUrl({
-          rewritten:
-            "I am reporting an ongoing condition at this location that is affecting safety, access, or quality of life and requires city review. The issue is specific, observable, and has not been resolved through ordinary follow-up. Please route this complaint to the responsible agency for inspection, documentation, and appropriate corrective action. I am requesting a service request number and any available timeline for response.",
-          category: "GENERAL 311 SERVICE REQUEST",
-          agency: "311",
-          agency_full: "NYC 311",
-          legal_note:
-            "311 routes complaints to the responsible agency, and response timelines vary by category, location, and whether an inspector can verify the condition.",
-          likelihood: "Medium"
-        });
-      }
-
-      async function optimizeComplaint(input, tone, fallbackIndex = null) {
-        const apiKey = getOpenAIKey();
-        if (!apiKey) {
-          await new Promise((resolve) => window.setTimeout(resolve, 420));
-          return withSubmitUrl(fallbackIndex === null ? fallbackFor(input, tone) : demoResults[fallbackIndex]);
-        }
-
-        try {
-          const { default: OpenAI } = await import("https://esm.sh/openai@4.104.0");
-          const client = new OpenAI({
-            apiKey,
-            dangerouslyAllowBrowser: true
-          });
-
-          const request = client.chat.completions.create({
-            model: "gpt-4o",
+      async function optimizeComplaint(input, tone) {
+        const response = await fetch("https://api.anthropic.com/v1/messages", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "x-api-key": ANTHROPIC_API_KEY,
+            "anthropic-version": "2023-06-01",
+            "anthropic-dangerous-direct-browser-access": "true"
+          },
+          body: JSON.stringify({
+            model: "claude-haiku-4-5-20251001",
             max_tokens: 1000,
-            messages: [
-              { role: "system", content: systemPrompt },
-              { role: "user", content: userPrompt(input, tone) }
-            ]
-          });
+            system: "You are an expert NYC 311 advocate. You know every complaint category, every responsible city agency, and the exact language that gets complaints acted on fastest. You always respond in valid JSON only — no preamble, no markdown, no explanation.",
+            messages: [{
+              role: "user",
+              content: `Here is a complaint from an NYC resident: ${input}
+Tone requested: ${tone}
+Return this exact JSON and nothing else:
+{
+  "rewritten": "3-5 sentences, specific and legally grounded",
+  "category": "exact 311 category in ALL CAPS",
+  "agency": "agency acronym e.g. HPD, DOT, DSNY",
+  "agency_full": "full agency name",
+  "legal_note": "one sentence: legal obligation + timeframe",
+  "likelihood": "High or Medium or Low"
+}`
+            }]
+          })
+        });
 
-          const response = await Promise.race([request, timeoutAfter(8000)]);
-          const content = response.choices?.[0]?.message?.content || "";
-          return withSubmitUrl(JSON.parse(stripJsonFences(content)));
-        } catch (error) {
-          if (error.message === "timeout") {
-            throw new Error("The request took more than 8 seconds — try again in a moment.");
-          }
-          throw new Error("Something went wrong — try rephrasing your complaint");
-        }
-      }
-
-      function renderSkeletons(count = 3) {
-        resultsEl.innerHTML = Array.from({ length: count }, () => {
-          return skeletonMarkup();
-        }).join("");
+        const data = await response.json();
+        const result = JSON.parse(stripJsonFences(data.content[0].text));
+        return withSubmitUrl(result);
       }
 
       function skeletonMarkup() {
         return `<article class="skeleton-card" aria-label="Loading result">
-            <div class="skeleton-line short"></div>
-            <div class="skeleton-line mid"></div>
-            <div class="skeleton-line tall"></div>
-            <div class="skeleton-line"></div>
-            <div class="skeleton-line mid"></div>
-          </article>`;
+          <div class="skeleton-line short"></div>
+          <div class="skeleton-line mid"></div>
+          <div class="skeleton-line tall"></div>
+          <div class="skeleton-line"></div>
+          <div class="skeleton-line mid"></div>
+        </article>`;
       }
 
       function createSkeletonCard() {
@@ -764,6 +636,15 @@ Return this exact JSON and nothing else:
 
       function likelihoodClass(likelihood) {
         return String(likelihood || "Medium").toLowerCase();
+      }
+
+      function escapeHtml(value) {
+        return String(value ?? "")
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&#039;");
       }
 
       function renderCard(result, sourceInput = "") {
@@ -798,52 +679,37 @@ Return this exact JSON and nothing else:
           const button = event.currentTarget;
           await navigator.clipboard.writeText(result.rewritten);
           button.textContent = "Copied";
-          window.setTimeout(() => {
-            button.textContent = "Copy Complaint";
-          }, 1300);
+          window.setTimeout(() => { button.textContent = "Copy Complaint"; }, 1300);
         });
 
         return article;
       }
 
-      function escapeHtml(value) {
-        return String(value ?? "")
-          .replace(/&/g, "&amp;")
-          .replace(/</g, "&lt;")
-          .replace(/>/g, "&gt;")
-          .replace(/"/g, "&quot;")
-          .replace(/'/g, "&#039;");
-      }
-
       function setError(message) {
-        state.error = message;
         errorEl.textContent = message || "";
         errorEl.classList.toggle("is-visible", Boolean(message));
       }
 
       async function loadExamples() {
-        renderSkeletons(3);
+        resultsEl.innerHTML = Array.from({ length: 3 }, () => skeletonMarkup()).join("");
         countEl.textContent = "Optimizing examples...";
         try {
           const results = await Promise.all(
-            examples.map((example, index) => optimizeComplaint(example.input, example.tone, index))
+            examples.map((ex) => optimizeComplaint(ex.input, ex.tone))
           );
           resultsEl.innerHTML = "";
-          results.forEach((result, index) => {
-            resultsEl.appendChild(renderCard(result, examples[index].input));
+          results.forEach((result, i) => {
+            resultsEl.appendChild(renderCard(result, examples[i].input));
           });
           countEl.textContent = "3 examples loaded";
-        } catch (error) {
-          resultsEl.innerHTML = "";
-          demoResults.map(withSubmitUrl).forEach((result, index) => {
-            resultsEl.appendChild(renderCard(result, examples[index].input));
-          });
-          countEl.textContent = "Demo examples loaded";
+        } catch {
+          resultsEl.innerHTML = `<p style="color:var(--red);padding:16px">Something went wrong loading examples — check your API key and try reloading.</p>`;
+          countEl.textContent = "";
         }
       }
 
-      toneButtons.forEach((button) => {
-        button.addEventListener("click", () => setTone(button.dataset.tone));
+      toneButtons.forEach((btn) => {
+        btn.addEventListener("click", () => setTone(btn.dataset.tone));
       });
 
       formEl.addEventListener("submit", async (event) => {
@@ -855,19 +721,18 @@ Return this exact JSON and nothing else:
         state.loading = true;
         submitButton.disabled = true;
         submitButton.textContent = "Optimizing...";
-        resultsEl.prepend(createSkeletonCard());
+        const skeleton = createSkeletonCard();
+        resultsEl.prepend(skeleton);
 
         try {
           const result = await optimizeComplaint(input, state.tone);
-          const firstSkeleton = resultsEl.querySelector(".skeleton-card");
-          if (firstSkeleton) firstSkeleton.remove();
+          skeleton.remove();
           resultsEl.prepend(renderCard(result, input));
           countEl.textContent = `${resultsEl.querySelectorAll(".result-card").length} results shown`;
           inputEl.value = "";
-        } catch (error) {
-          const firstSkeleton = resultsEl.querySelector(".skeleton-card");
-          if (firstSkeleton) firstSkeleton.remove();
-          setError(error.message || "Something went wrong — try rephrasing your complaint");
+        } catch {
+          skeleton.remove();
+          setError("Something went wrong — try rephrasing your complaint");
         } finally {
           state.loading = false;
           submitButton.disabled = false;
