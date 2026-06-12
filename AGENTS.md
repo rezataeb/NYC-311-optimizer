@@ -32,7 +32,7 @@ Run locally before handing off changes:
 npm run dev
 ```
 
-This starts `vercel dev`, which serves both the Vite frontend and the `api/optimize.js` serverless function on the same port.
+This starts the Vite dev server with an inline API middleware that mirrors `api/optimize.js`. Open `http://localhost:5173`.
 
 To deploy:
 
