@@ -1,85 +1,57 @@
-# Pipeline Pulse CRM
+# NYC 311 Complaint Optimizer
 
-Pipeline Pulse CRM is a lightweight pipeline review dashboard for B2B SaaS sales teams. It helps sales managers scan open opportunities, identify risky deals, compare owner books, and understand weighted pipeline.
+A single-page civic tool that turns plain English frustrations into strong, legally grounded 311 complaints — routed to the right NYC agency with a direct filing link.
 
-The current implementation is intentionally local-first: CRM records are seeded from JSON into a local SQLite database, FastAPI serves the demo API and static files, business logic runs in the browser, and tests cover the scoring and summary functions.
+## What It Does
 
-## Features
-
-- Open and weighted pipeline metrics.
-- Owner-level filtering.
-- Account health overview.
-- Opportunity cards with amount, stage, probability, weighted value, and recent activity age.
-- FastAPI API backed by local SQLite.
-- Deterministic deal-risk scoring.
-- Forecast categories: `Commit`, `Best Case`, `Pipeline`, and `At Risk`.
-- Unit tests for CRM scoring and summary logic.
+- Takes a plain English complaint as input
+- Lets you pick a tone: **Polite**, **Firm**, or **Urgent**
+- Calls the Anthropic Claude API to return a structured result:
+  - Rewritten complaint (specific and legally grounded)
+  - 311 category (e.g. `HEAT/HOT WATER`, `NOISE`, `SANITATION`)
+  - Responsible agency acronym and full name
+  - Legal note (what the city is obligated to do and by when)
+  - Response likelihood (High / Medium / Low)
+- Shows the result as a styled card with a **Copy Complaint** button
+- Includes a **Submit to 311** link that goes directly to the right NYC portal page
+- Pre-loads 3 ready-to-file example complaints on page load
 
 ## Project Structure
 
 ```text
 .
-├── AGENTS.md
-├── data/
-│   └── crm.json
-├── index.html
-├── package.json
-├── pyproject.toml
-├── backend/
-│   ├── database.py
-│   └── main.py
-├── src/
-│   ├── crm.js
-│   ├── main.js
-│   └── styles.css
-└── test/
-    └── crm.test.js
+├── index.html        # entire app — HTML, CSS, and JS in one file
+├── package.json      # Vite dev/build scripts
+└── .env              # VITE_ANTHROPIC_API_KEY (not committed)
 ```
 
-## Run Locally
+## Setup
+
+1. Copy `.env.example` or create `.env`:
 
 ```bash
-npm test
+VITE_ANTHROPIC_API_KEY=sk-ant-...
+```
+
+2. Install and run:
+
+```bash
+npm install
 npm run dev
 ```
 
-Open:
+Open `http://localhost:5173`
 
-```text
-http://localhost:5173
+## Build
+
+```bash
+npm run build
 ```
 
-The first backend run creates `data/crm.sqlite` from `data/crm.json`. Delete that SQLite file to reseed from the fixture.
+Output goes to `dist/`. The app is entirely static — deploy anywhere (Netlify, Vercel, GitHub Pages).
 
-Useful API endpoints:
+## Tech
 
-```text
-GET /api/health
-GET /api/crm
-```
-
-## CRM Data
-
-The dashboard seeds `data/crm.sqlite` from `data/crm.json` with these record groups:
-
-- `accounts`: company profile, owner, segment, health, ARR, and renewal date.
-- `opportunities`: stage, amount, probability, close date, next step, activity age, and contact coverage.
-- `contacts`: account stakeholders and influence level.
-- `tasks`: open sales follow-ups and due dates.
-- `activities`: recent calls, emails, and notes.
-
-## Pipeline Logic
-
-Core logic lives in `src/crm.js`.
-
-- `scoreDealRisk` assigns a 0-100 risk score based on stale activity, missing next step, contact coverage, close-date pressure, deal size, and account health.
-- `riskLabel` maps scores to `Low`, `Medium`, `High`, or `Critical`.
-- `forecastCategory` maps opportunities into forecast buckets.
-- `summarizePipeline` calculates open pipeline, weighted pipeline, critical deal count, and overdue task count.
-
-## Development Notes
-
-- Keep CRM calculations deterministic so sales users can understand why a deal is flagged.
-- Update tests whenever scoring, forecast, filtering, or summary behavior changes.
-- Keep browser code in `src/main.js` thin; business rules belong in `src/crm.js`.
-- Avoid adding external dependencies unless they materially simplify the app.
+- Vanilla JS + Vite (no framework)
+- Anthropic Claude API (`claude-haiku-4-5-20251001`) via direct browser fetch
+- No backend, no login, no database
