@@ -116,6 +116,24 @@
         background: var(--green);
       }
 
+      .lang-select {
+        height: 36px;
+        padding: 4px 10px;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.78);
+        color: var(--muted);
+        font: inherit;
+        font-size: 0.88rem;
+        cursor: pointer;
+        outline: none;
+        margin-left: 10px;
+      }
+
+      .lang-select:focus {
+        border-color: var(--city-blue);
+      }
+
       main {
         display: grid;
         grid-template-columns: minmax(320px, 430px) 1fr;
@@ -361,6 +379,42 @@
         padding: 12px 13px;
         background: var(--blue-soft);
         line-height: 1.5;
+      }
+
+      .lang-toggle {
+        display: flex;
+        gap: 6px;
+        margin: 10px 0 0;
+      }
+
+      .lang-toggle-btn {
+        min-height: 28px;
+        padding: 4px 10px;
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        background: #f7f9fb;
+        color: var(--muted);
+        font: inherit;
+        font-size: 0.8rem;
+        font-weight: 720;
+        cursor: pointer;
+        transition: background 140ms ease, border-color 140ms ease, color 140ms ease;
+      }
+
+      .lang-toggle-btn.active {
+        border-color: var(--city-blue);
+        background: var(--blue-soft);
+        color: var(--city-blue);
+      }
+
+      .user-summary-box {
+        margin: 0 0 14px;
+        padding: 10px 13px;
+        border-radius: 6px;
+        background: #f2f4f7;
+        color: var(--muted);
+        font-size: 0.88rem;
+        line-height: 1.45;
       }
 
       .legal {
@@ -692,6 +746,78 @@
         display: block;
       }
 
+      .lang-detect-banner,
+      .addr-suggest-banner {
+        display: none;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 8px;
+        padding: 9px 13px;
+        border: 1px solid #b8d8f0;
+        border-radius: 8px;
+        background: var(--blue-soft);
+        color: var(--city-blue);
+        font-size: 0.85rem;
+      }
+
+      .lang-detect-banner { margin: 8px 0 0; }
+      .addr-suggest-banner { margin: 4px 0 8px; }
+
+      .lang-detect-banner.is-visible,
+      .addr-suggest-banner.is-visible {
+        display: flex;
+      }
+
+      .detect-btns {
+        display: flex;
+        gap: 6px;
+        flex-shrink: 0;
+      }
+
+      .detect-btn {
+        min-height: 26px;
+        padding: 3px 10px;
+        border-radius: 6px;
+        font: inherit;
+        font-size: 0.8rem;
+        font-weight: 720;
+        cursor: pointer;
+        white-space: nowrap;
+        transition: background 140ms ease;
+      }
+
+      .detect-btn-accept {
+        border: 1px solid var(--city-blue);
+        background: var(--city-blue);
+        color: white;
+      }
+
+      .detect-btn-accept:hover { background: var(--blue-deep); }
+
+      .detect-btn-decline {
+        border: 1px solid var(--line);
+        background: white;
+        color: var(--muted);
+      }
+
+      .detect-btn-decline:hover { background: var(--faint); }
+
+      .neighborhood-info {
+        margin: 8px 0 0;
+        color: var(--city-blue);
+        font-size: 0.82rem;
+        font-weight: 680;
+        min-height: 0;
+      }
+
+      .card-location {
+        margin: 3px 0 0;
+        color: var(--muted);
+        font-size: 0.82rem;
+        font-weight: 600;
+      }
+
       @media (max-width: 520px) {
         h1 {
           font-size: 2.25rem;
@@ -727,6 +853,12 @@
             <span class="dot" aria-hidden="true"></span>
             AI-assisted civic filing
           </div>
+          <select id="lang-select" class="lang-select" aria-label="Language">
+            <option value="en">🇺🇸 English</option>
+            <option value="es">🇪🇸 Español</option>
+            <option value="zh">🇨🇳 中文</option>
+            <option value="ru">🇷🇺 Русский</option>
+          </select>
         </div>
       </header>
 
@@ -742,12 +874,20 @@
         <section class="panel" aria-labelledby="optimizer-title">
           <h2 class="sr-only" id="optimizer-title">Complaint optimizer form</h2>
           <form id="complaint-form">
-            <label for="complaint-input">Describe your problem in plain English</label>
+            <label for="complaint-input" id="complaint-label">Describe your problem in plain English</label>
             <textarea
               id="complaint-input"
               placeholder="Example: The apartment has had no hot water for three days and the landlord has not responded."
               required
             ></textarea>
+
+            <div class="lang-detect-banner" id="lang-detect-banner" role="status">
+              <span id="lang-detect-msg"></span>
+              <div class="detect-btns">
+                <button class="detect-btn detect-btn-accept" id="lang-detect-accept" type="button"></button>
+                <button class="detect-btn detect-btn-decline" id="lang-detect-decline" type="button"></button>
+              </div>
+            </div>
 
             <div class="tone-row" role="group" aria-label="Tone selector">
               <button class="tone-button" type="button" data-tone="polite" aria-pressed="false">Polite</button>
@@ -768,17 +908,25 @@
                 <option value="Bronx">Bronx</option>
                 <option value="Staten Island">Staten Island</option>
               </select>
+              <div class="addr-suggest-banner" id="addr-suggest-banner" role="status">
+                <span id="addr-suggest-msg"></span>
+                <div class="detect-btns">
+                  <button class="detect-btn detect-btn-accept" id="addr-suggest-accept" type="button">Yes, use this</button>
+                  <button class="detect-btn detect-btn-decline" id="addr-suggest-decline" type="button">No, keep mine</button>
+                </div>
+              </div>
+              <div class="neighborhood-info" id="neighborhood-info"></div>
             </div>
 
             <button class="primary" id="submit-button" type="submit">Optimize My Complaint</button>
-            <p class="hint">
+            <p class="hint" id="hint-text">
               The app returns a stronger complaint, the likely 311 category, responsible agency, legal note, and a direct filing link.
             </p>
             <div class="error" id="error" role="alert"></div>
 
             <div class="or-divider">or</div>
             <button class="demo-button" id="demo-button" type="button">▶ Try a Demo</button>
-            <p class="demo-hint">See how it works in 10 seconds — no typing required</p>
+            <p class="demo-hint" id="demo-hint">See how it works in 10 seconds — no typing required</p>
           </form>
         </section>
 
@@ -796,6 +944,8 @@
     </div>
 
     <script type="module">
+      import { TRANSLATIONS } from './translations.js';
+
       const SUBMIT_URLS = {
         "HEAT/HOT WATER": "https://portal.311.nyc.gov/article/?kanumber=KA-01036",
         NOISE: "https://portal.311.nyc.gov/article/?kanumber=KA-01198",
@@ -805,14 +955,23 @@
         DEFAULT: "https://portal.311.nyc.gov/"
       };
 
-      // Fix 1: pre-loaded examples include real NYC addresses, skipping Call 1
+      const LANG_NAMES = { en: "English", es: "Spanish", zh: "Mandarin Chinese", ru: "Russian" };
+
+      // Pre-loaded examples reload in the selected language when language changes
       const examples = [
         { input: "My landlord hasn't fixed the heat in 2 weeks", tone: "firm",   location: { address: "280 Nostrand Ave",   borough: "Brooklyn"  } },
         { input: "My neighbor plays loud music every night after midnight",        tone: "urgent", location: { address: "170 Amsterdam Ave", borough: "Manhattan" } },
         { input: "There's a giant pothole on my street that damaged my car",      tone: "polite", location: { address: "Queens Blvd",        borough: "Queens"    } }
       ];
 
-      const DEMO_COMPLAINT = "My landlord has not provided heat for 3 weeks. The temperature in my apartment drops below 50°F at night. I have a 2-year-old child living here.";
+      // Demo complaints in each supported language
+      const DEMO_COMPLAINTS = {
+        en: "My landlord has not provided heat for 3 weeks. The temperature in my apartment drops below 50°F at night. I have a 2-year-old child living here.",
+        es: "Mi casero no ha proporcionado calefacción durante 3 semanas.",
+        zh: "我的房东三周没有提供暖气。",
+        ru: "Мой арендодатель не обеспечивал отопление в течение 3 недель."
+      };
+
       const DEMO_ADDRESS   = "280 Nostrand Ave";
       const DEMO_BOROUGH   = "Brooklyn";
       const DEMO_TONE      = "firm";
@@ -826,7 +985,7 @@
       };
 
       // phase: "idle" | "classifying" | "needs_location" | "optimizing" | "tone-switching"
-      const state = { tone: "firm", phase: "idle", pendingInput: null, locationReq: null, demo: false, lastResult: null, demoCard: null };
+      const state = { tone: "firm", phase: "idle", pendingInput: null, locationReq: null, demo: false, lastResult: null, demoCard: null, lang: "en", neighborhood: null, langSuggDismissed: false, skipAddrCorrection: false };
 
       const inputEl         = document.querySelector("#complaint-input");
       const formEl          = document.querySelector("#complaint-form");
@@ -840,8 +999,45 @@
       const boroughSelect   = document.querySelector("#borough-select");
       const addressPreview  = document.querySelector("#address-preview");
       const locationError   = document.querySelector("#location-error");
-      const demoButton      = document.querySelector("#demo-button");
-      const demoBanner      = document.querySelector("#demo-banner");
+      const demoButton         = document.querySelector("#demo-button");
+      const demoBanner         = document.querySelector("#demo-banner");
+      const langSelect         = document.querySelector("#lang-select");
+      const langDetectBanner   = document.querySelector("#lang-detect-banner");
+      const langDetectMsg      = document.querySelector("#lang-detect-msg");
+      const langDetectAccept   = document.querySelector("#lang-detect-accept");
+      const langDetectDecline  = document.querySelector("#lang-detect-decline");
+      const neighborhoodInfo   = document.querySelector("#neighborhood-info");
+      const addrSuggestBanner  = document.querySelector("#addr-suggest-banner");
+      const addrSuggestMsg     = document.querySelector("#addr-suggest-msg");
+      const addrSuggestAccept  = document.querySelector("#addr-suggest-accept");
+      const addrSuggestDecline = document.querySelector("#addr-suggest-decline");
+
+      // Translation helper — uses card-level lang when provided, otherwise state.lang
+      function t(key, lang) {
+        const l = lang || state.lang;
+        const dict = TRANSLATIONS[l] || TRANSLATIONS.en;
+        return dict[key] ?? TRANSLATIONS.en[key] ?? key;
+      }
+
+      function applyTranslations() {
+        document.querySelector("#complaint-label").textContent = t("label_complaint");
+        inputEl.placeholder = t("placeholder");
+        document.querySelector('[data-tone="polite"]').textContent = t("polite");
+        document.querySelector('[data-tone="firm"]').textContent   = t("firm");
+        document.querySelector('[data-tone="urgent"]').textContent = t("urgent");
+        demoButton.textContent = t("try_demo");
+        document.querySelector("#demo-hint").textContent  = t("demo_hint");
+        document.querySelector("#hint-text").textContent  = t("hint_text");
+        document.querySelector("#results-title").textContent = t("results_title");
+        // Re-format the result count in the new language if cards are visible
+        const cardCount = resultsEl.querySelectorAll(".result-card").length;
+        if (cardCount > 0) {
+          countEl.textContent = `${cardCount} ${t("results_shown")}`;
+        }
+        if (state.phase === "idle") {
+          submitButton.textContent = t("optimize_button");
+        }
+      }
 
       function setTone(tone) {
         state.tone = tone;
@@ -870,7 +1066,6 @@
         };
       }
 
-      // Fix 3: client-side address normalization
       function normalizeAddress(raw) {
         let addr = raw.trim().replace(/\s+/g, " ").replace(/[,;.]+$/, "");
         addr = addr.replace(/\b\w+/g, (w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase());
@@ -882,15 +1077,15 @@
           .replace(/\bDr\b/g, "Drive")
           .replace(/\bPl\b/g, "Place")
           .replace(/\bCt\b/g, "Court")
-          .replace(/\bLn\b/g, "Lane");
+          .replace(/\bLn\b/g, "Lane")
+          .replace(/\bPkwy\b/g, "Parkway");
       }
 
-      // Fix 4: address validation
-      const REJECT_WORDS = new Set(["fake", "test", "asdf", "lorem", "example", "foo", "bar", "baz"]);
+      const REJECT_WORDS = new Set(["fake", "test", "asdf", "lorem", "example", "foo", "bar", "baz", "qwerty", "xxx", "none", "000"]);
       function validateAddress(address) {
         const trimmed = address.trim();
-        const msg = "Please enter a valid NYC street address (e.g. 123 Atlantic Ave)";
-        if (!trimmed) return msg;
+        const msg = t("error_address");
+        if (!trimmed || trimmed.length < 5) return msg;
         if (!/\d/.test(trimmed)) return msg;
         if (!/\d+\s+[A-Za-z]/.test(trimmed)) return msg;
         if (trimmed.toLowerCase().split(/\s+/).some((w) => REJECT_WORDS.has(w))) return msg;
@@ -898,26 +1093,29 @@
       }
 
       async function classifyLocation(input) {
-        const res = await fetch("/api/optimize", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ input, action: "classify_location" })
-        });
-        if (!res.ok) throw new Error("Classification failed");
-        return res.json();
-      }
-
-      async function optimizeComplaint(input, tone, location = null) {
-        const body = { input, tone };
-        if (location) body.location = location;
+        const body = { input, action: "classify_location" };
+        if (state.lang !== "en") body.language = state.lang;
         const res = await fetch("/api/optimize", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(body)
         });
-        if (!res.ok) throw new Error("Something went wrong — try rephrasing your complaint");
+        if (!res.ok) throw new Error("Classification failed");
+        return res.json();
+      }
+
+      async function optimizeComplaint(input, tone, location = null, lang = "en") {
+        const body = { input, tone };
+        if (location) body.location = location;
+        if (lang && lang !== "en") body.language = lang;
+        const res = await fetch("/api/optimize", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body)
+        });
+        if (!res.ok) throw new Error(t("error_generic"));
         const result = await res.json();
-        if (result.error) throw new Error("Something went wrong — try rephrasing your complaint");
+        if (result.error) throw new Error(t("error_generic"));
         return withSubmitUrl(result);
       }
 
@@ -932,9 +1130,9 @@
       }
 
       function createSkeletonCard() {
-        const t = document.createElement("template");
-        t.innerHTML = skeletonMarkup().trim();
-        return t.content.firstElementChild;
+        const tmpl = document.createElement("template");
+        tmpl.innerHTML = skeletonMarkup().trim();
+        return tmpl.content.firstElementChild;
       }
 
       function likelihoodClass(likelihood) {
@@ -947,43 +1145,168 @@
           .replace(/"/g, "&quot;").replace(/'/g, "&#039;");
       }
 
-      function renderCard(result, sourceInput = "") {
+      function renderCard(result, sourceInput = "", lang = "en") {
+        // tl() uses the card's creation-time lang, not state.lang
+        const tl = (key) => t(key, lang);
+
+        const lk = likelihoodClass(result.likelihood);
+        // Show toggle + summary box whenever we have a user_summary in the user's language
+        const hasLocalContent = lang !== "en" && Boolean(result.user_summary);
+
         const article = document.createElement("article");
         article.className = "result-card";
-        article.dataset.rewritten = result.rewritten;
+        article.dataset.rewritten   = result.rewritten;
+        article.dataset.cardLang    = lang;
+        article.dataset.userSummary = result.user_summary || "";
+
         article.innerHTML = `
           <div class="card-top">
             <div>
               <p class="category">${escapeHtml(result.category)}</p>
               <p class="agency">${escapeHtml(result.agency)} · ${escapeHtml(result.agency_full)}</p>
+              ${result.neighborhood ? `<p class="card-location">📍 ${escapeHtml(result.neighborhood)}, ${escapeHtml(result.card_borough || "")}</p>` : ""}
             </div>
-            <span class="likelihood ${likelihoodClass(result.likelihood)}">${escapeHtml(result.likelihood)} likelihood</span>
+            <span class="likelihood ${lk}">${escapeHtml(tl("likelihood_" + lk))}</span>
           </div>
           <div class="card-body">
             <div class="tone-loading" hidden></div>
-            ${sourceInput ? `<div class="section"><span class="section-label">Original Complaint</span><div>${escapeHtml(sourceInput)}</div></div>` : ""}
+            ${sourceInput ? `<div class="section"><span class="section-label">${escapeHtml(tl("original_complaint"))}</span><div>${escapeHtml(sourceInput)}</div></div>` : ""}
             <div class="section">
-              <span class="section-label">Optimized Complaint</span>
+              <span class="section-label">${escapeHtml(tl("optimized_complaint"))}</span>
               <div class="complaint-box">${escapeHtml(result.rewritten)}</div>
+              ${hasLocalContent ? `
+              <div class="lang-toggle">
+                <button class="lang-toggle-btn active" type="button" data-view="en">${escapeHtml(tl("toggle_english"))}</button>
+                <button class="lang-toggle-btn" type="button" data-view="translated">${escapeHtml(tl("toggle_translated"))}</button>
+              </div>` : ""}
             </div>
             <div class="section">
-              <span class="section-label">Legal Note</span>
+              <span class="section-label">${escapeHtml(tl("legal_note"))}</span>
               <div class="legal">${escapeHtml(result.legal_note)}</div>
             </div>
+            ${hasLocalContent ? `<div class="user-summary-box">${escapeHtml(tl("what_we_filed"))} ${escapeHtml(result.user_summary)}</div>` : ""}
             <div class="actions">
-              <a class="secondary" href="${result.submit_url}" target="_blank" rel="noreferrer">Submit to 311</a>
-              <button class="copy" type="button">Copy Complaint</button>
+              <a class="secondary" href="${result.submit_url}" target="_blank" rel="noreferrer">${escapeHtml(tl("submit_311"))}</a>
+              <button class="copy" type="button">${escapeHtml(tl("copy_complaint"))}</button>
             </div>
             <div class="tone-error" hidden></div>
           </div>
         `;
+
+        // Toggle: English tab shows rewritten (en), other tab shows user_summary in user's language
+        if (hasLocalContent) {
+          const toggleBtns   = article.querySelectorAll(".lang-toggle-btn");
+          const complaintBox = article.querySelector(".complaint-box");
+          toggleBtns.forEach((btn) => {
+            btn.addEventListener("click", () => {
+              toggleBtns.forEach((b) => b.classList.remove("active"));
+              btn.classList.add("active");
+              complaintBox.textContent = btn.dataset.view === "translated"
+                ? article.dataset.userSummary
+                : article.dataset.rewritten;
+            });
+          });
+        }
+
+        // Copy button always copies the English version (submitted to 311)
         article.querySelector(".copy").addEventListener("click", async (e) => {
           const btn = e.currentTarget;
-          await navigator.clipboard.writeText(btn.closest(".result-card").dataset.rewritten);
-          btn.textContent = "Copied";
-          window.setTimeout(() => { btn.textContent = "Copy Complaint"; }, 1300);
+          await navigator.clipboard.writeText(article.dataset.rewritten);
+          btn.textContent = tl("copy_done");
+          window.setTimeout(() => { btn.textContent = tl("copy_complaint"); }, 1300);
         });
+
         return article;
+      }
+
+      // ── Feature 1: Language detection ─────────────────────────────────
+      const LANG_DISPLAY = { en: "English", es: "Español", zh: "中文", ru: "Русский" };
+      let langDetectTimer = null;
+
+      function hideLangDetectBanner() {
+        langDetectBanner.classList.remove("is-visible");
+      }
+
+      async function detectLanguage(text) {
+        try {
+          const res = await fetch("/api/optimize", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ input: text, action: "detect_language" })
+          });
+          if (!res.ok) return null;
+          return res.json();
+        } catch { return null; }
+      }
+
+      function scheduleLangDetect() {
+        if (state.demo || state.langSuggDismissed) return;
+        clearTimeout(langDetectTimer);
+        if (inputEl.value.length < 20) { hideLangDetectBanner(); return; }
+        langDetectTimer = setTimeout(async () => {
+          const text = inputEl.value;
+          if (text.length < 20) return;
+          const result = await detectLanguage(text);
+          if (!result || result.confidence !== "high") return;
+          const dl = result.detected_language;
+          if (!dl || dl === state.lang) { hideLangDetectBanner(); return; }
+          const dlName = LANG_DISPLAY[dl] || dl;
+          langDetectMsg.textContent = `We detected ${dlName} — switch to ${dlName}?`;
+          langDetectAccept.textContent = "Yes, switch";
+          langDetectAccept.dataset.lang = dl;
+          langDetectDecline.textContent = `No, keep ${LANG_DISPLAY[state.lang] || "English"}`;
+          langDetectBanner.classList.add("is-visible");
+        }, 1000);
+      }
+
+      // ── Feature 2: Neighborhood detection ────────────────────────────
+      let neighborhoodTimer = null;
+
+      async function detectNeighborhood(address, borough) {
+        try {
+          const res = await fetch("/api/optimize", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ input: `${address}, ${borough}`, action: "detect_neighborhood", location: { address, borough } })
+          });
+          if (!res.ok) return null;
+          return res.json();
+        } catch { return null; }
+      }
+
+      function scheduleNeighborhoodDetect() {
+        if (state.demo) return;
+        clearTimeout(neighborhoodTimer);
+        const addr = addressInput.value.trim();
+        const borough = boroughSelect.value;
+        if (!addr || !borough || validateAddress(addr)) {
+          neighborhoodInfo.textContent = "";
+          state.neighborhood = null;
+          return;
+        }
+        neighborhoodTimer = setTimeout(async () => {
+          const addr2 = addressInput.value.trim();
+          const borough2 = boroughSelect.value;
+          if (!addr2 || !borough2 || validateAddress(addr2)) return;
+          const result = await detectNeighborhood(normalizeAddress(addr2), borough2);
+          if (!result || !result.neighborhood) return;
+          state.neighborhood = result;
+          const cbText = result.community_board ? ` — Community Board ${result.community_board}` : "";
+          neighborhoodInfo.textContent = `📍 ${result.neighborhood}, ${borough2}${cbText}`;
+        }, 500);
+      }
+
+      // ── Feature 3: Address correction (Layer 3) ───────────────────────
+      async function correctAddress(address, borough) {
+        try {
+          const res = await fetch("/api/optimize", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ input: address, action: "correct_address", location: { borough } })
+          });
+          if (!res.ok) return null;
+          return res.json();
+        } catch { return null; }
       }
 
       function setError(message) {
@@ -1028,7 +1351,7 @@
           addressInput.required = false;
         }
         locationSection.classList.add("is-visible");
-        submitButton.textContent = "Get Results";
+        submitButton.textContent = t("get_results");
         updateLocationButton();
         if (req === "full_address") addressInput.focus();
         else boroughSelect.focus();
@@ -1046,8 +1369,12 @@
         boroughSelect.disabled = false;
         boroughSelect.classList.remove("demo-input");
         addressPreview.textContent = "";
+        neighborhoodInfo.textContent = "";
+        addrSuggestBanner.classList.remove("is-visible");
         setLocationError(null);
         state.locationReq = null;
+        state.neighborhood = null;
+        state.skipAddrCorrection = false;
       }
 
       function resetForm() {
@@ -1057,23 +1384,27 @@
         inputEl.disabled = false;
         inputEl.classList.remove("demo-input");
         submitButton.disabled = false;
-        submitButton.textContent = "Optimize My Complaint";
+        submitButton.textContent = t("optimize_button");
       }
 
       async function runOptimize(input, tone, location = null) {
         const skeleton = createSkeletonCard();
         resultsEl.prepend(skeleton);
         try {
-          const result = await optimizeComplaint(input, tone, location);
+          const result = await optimizeComplaint(input, tone, location, state.lang);
           skeleton.remove();
-          const card = renderCard(result, input);
+          if (location?.neighborhood) {
+            result.neighborhood = location.neighborhood;
+            result.card_borough = location.borough;
+          }
+          const card = renderCard(result, input, state.lang);
           resultsEl.prepend(card);
-          countEl.textContent = `${resultsEl.querySelectorAll(".result-card").length} results shown`;
+          countEl.textContent = `${resultsEl.querySelectorAll(".result-card").length} ${t("results_shown")}`;
           inputEl.value = "";
           state.lastResult = { input, location, cardEl: card };
         } catch {
           skeleton.remove();
-          if (!state.demo) setError("Something went wrong — try rephrasing your complaint");
+          if (!state.demo) setError(t("error_generic"));
         } finally {
           resetForm();
         }
@@ -1084,12 +1415,16 @@
         setTone(newTone);
 
         const { input, location, cardEl } = state.lastResult;
-        const cardBody      = cardEl.querySelector(".card-body");
-        const toneLoading   = cardEl.querySelector(".tone-loading");
-        const toneErrorEl   = cardEl.querySelector(".tone-error");
-        const complaintBox  = cardEl.querySelector(".complaint-box");
-        const legalEl       = cardEl.querySelector(".legal");
-        const likelihoodEl  = cardEl.querySelector(".likelihood");
+        const cardLang    = cardEl.dataset.cardLang || "en";
+        const tl          = (key) => t(key, cardLang);
+        const cardBody    = cardEl.querySelector(".card-body");
+        const toneLoading = cardEl.querySelector(".tone-loading");
+        const toneErrorEl = cardEl.querySelector(".tone-error");
+        const complaintBox= cardEl.querySelector(".complaint-box");
+        const legalEl     = cardEl.querySelector(".legal");
+        const likelihoodEl= cardEl.querySelector(".likelihood");
+        const summaryBox  = cardEl.querySelector(".user-summary-box");
+        const activeToggle= cardEl.querySelector(".lang-toggle-btn.active");
 
         toneLoading.textContent = `Re-optimizing for ${newTone} tone…`;
         toneLoading.hidden = false;
@@ -1098,14 +1433,29 @@
         state.phase = "tone-switching";
 
         try {
-          const result = await optimizeComplaint(input, newTone, location);
-          complaintBox.textContent = result.rewritten;
-          legalEl.textContent = result.legal_note;
-          likelihoodEl.textContent = `${result.likelihood} likelihood`;
-          likelihoodEl.className = `likelihood ${likelihoodClass(result.likelihood)}`;
+          const result = await optimizeComplaint(input, newTone, location, cardLang);
+          const lk = likelihoodClass(result.likelihood);
+
           cardEl.dataset.rewritten = result.rewritten;
+          if (result.user_summary) {
+            cardEl.dataset.userSummary = result.user_summary;
+          }
+
+          // Keep whichever view (English or user-language summary) was active
+          const showingTranslated = activeToggle && activeToggle.dataset.view === "translated";
+          complaintBox.textContent = (showingTranslated && result.user_summary)
+            ? result.user_summary
+            : result.rewritten;
+
+          legalEl.textContent = result.legal_note;
+          likelihoodEl.textContent = tl("likelihood_" + lk);
+          likelihoodEl.className = `likelihood ${lk}`;
+
+          if (summaryBox && result.user_summary) {
+            summaryBox.textContent = `${tl("what_we_filed")} ${result.user_summary}`;
+          }
         } catch {
-          toneErrorEl.textContent = "Couldn't switch tone — try again";
+          toneErrorEl.textContent = tl("error_tone_switch");
           toneErrorEl.hidden = false;
         } finally {
           toneLoading.hidden = true;
@@ -1116,16 +1466,16 @@
 
       async function loadExamples() {
         resultsEl.innerHTML = Array.from({ length: 3 }, () => skeletonMarkup()).join("");
-        countEl.textContent = "Optimizing examples...";
+        countEl.textContent = t("loading_examples");
         try {
           const results = await Promise.all(
-            examples.map((ex) => optimizeComplaint(ex.input, ex.tone, ex.location))
+            examples.map((ex) => optimizeComplaint(ex.input, ex.tone, ex.location, state.lang))
           );
           resultsEl.innerHTML = "";
-          results.forEach((result, i) => resultsEl.appendChild(renderCard(result, examples[i].input)));
-          countEl.textContent = "3 examples loaded";
+          results.forEach((result, i) => resultsEl.appendChild(renderCard(result, examples[i].input, state.lang)));
+          countEl.textContent = t("results_loaded");
         } catch {
-          resultsEl.innerHTML = `<p style="color:var(--red);padding:16px">Something went wrong loading examples — check your API key and try reloading.</p>`;
+          resultsEl.innerHTML = `<p style="color:var(--red);padding:16px">${t("error_api_load")}</p>`;
           countEl.textContent = "";
         }
       }
@@ -1137,18 +1487,19 @@
         demoButton.hidden = true;
         demoBanner.classList.add("is-visible");
 
-        inputEl.value = DEMO_COMPLAINT;
+        const demoComplaint = DEMO_COMPLAINTS[state.lang] || DEMO_COMPLAINTS.en;
+        inputEl.value = demoComplaint;
         inputEl.readOnly = true;
         inputEl.classList.add("demo-input");
 
         setTone(DEMO_TONE);
 
         state.phase = "classifying";
-        state.pendingInput = DEMO_COMPLAINT;
+        state.pendingInput = demoComplaint;
         submitButton.disabled = true;
-        submitButton.textContent = "Analyzing...";
+        submitButton.textContent = t("analyzing");
 
-        try { await classifyLocation(DEMO_COMPLAINT); } catch { /* ignored in demo */ }
+        try { await classifyLocation(demoComplaint); } catch { /* ignored in demo */ }
         if (!state.demo) return;
 
         state.phase = "needs_location";
@@ -1163,30 +1514,30 @@
         updateAddressPreview();
 
         state.phase = "optimizing";
-        submitButton.textContent = "Optimizing...";
+        submitButton.textContent = t("optimizing");
 
         const skeleton = createSkeletonCard();
         resultsEl.prepend(skeleton);
 
         let card;
         try {
-          const result = await optimizeComplaint(DEMO_COMPLAINT, DEMO_TONE, { address: DEMO_ADDRESS, borough: DEMO_BOROUGH });
+          const result = await optimizeComplaint(demoComplaint, DEMO_TONE, { address: DEMO_ADDRESS, borough: DEMO_BOROUGH }, state.lang);
           if (!state.demo) { skeleton.remove(); return; }
           skeleton.remove();
-          card = renderCard(result, DEMO_COMPLAINT);
+          card = renderCard(result, demoComplaint, state.lang);
         } catch {
           if (!state.demo) { skeleton.remove(); return; }
           skeleton.remove();
-          card = renderCard(withSubmitUrl(DEMO_FALLBACK), DEMO_COMPLAINT);
+          card = renderCard(withSubmitUrl(DEMO_FALLBACK), demoComplaint, "en");
         }
 
         resultsEl.prepend(card);
         state.demoCard = card;
-        countEl.textContent = "Demo result shown";
+        countEl.textContent = t("demo_result");
 
         state.phase = "idle";
         submitButton.disabled = true;
-        submitButton.textContent = "Optimize My Complaint";
+        submitButton.textContent = t("optimize_button");
       }
 
       function silentExitDemo() {
@@ -1208,7 +1559,7 @@
         state.pendingInput = null;
         state.lastResult = null;
         submitButton.disabled = false;
-        submitButton.textContent = "Optimize My Complaint";
+        submitButton.textContent = t("optimize_button");
 
         inputEl.focus();
       }
@@ -1219,7 +1570,7 @@
         if (card) card.remove();
         state.demoCard = null;
         countEl.textContent = resultsEl.querySelectorAll(".result-card").length
-          ? `${resultsEl.querySelectorAll(".result-card").length} results shown`
+          ? `${resultsEl.querySelectorAll(".result-card").length} ${t("results_shown")}`
           : "";
       }
 
@@ -1237,26 +1588,69 @@
       });
 
       inputEl.addEventListener("focus", () => { if (state.demo) silentExitDemo(); });
+      inputEl.addEventListener("input", () => { scheduleLangDetect(); });
+
+      langDetectAccept.addEventListener("click", () => {
+        const dl = langDetectAccept.dataset.lang;
+        if (dl && TRANSLATIONS[dl]) {
+          state.lang = dl;
+          langSelect.value = dl;
+          applyTranslations();
+          loadExamples();
+        }
+        hideLangDetectBanner();
+      });
+
+      langDetectDecline.addEventListener("click", () => {
+        state.langSuggDismissed = true;
+        hideLangDetectBanner();
+      });
 
       boroughSelect.addEventListener("change", () => {
         if (state.demo) { silentExitDemo(); return; }
         updateLocationButton();
         setLocationError(null);
+        scheduleNeighborhoodDetect();
       });
 
       addressInput.addEventListener("focus", () => { if (state.demo) silentExitDemo(); });
-
-      addressInput.addEventListener("input", () => { setLocationError(null); updateLocationButton(); });
-
+      addressInput.addEventListener("input", () => {
+        setLocationError(null);
+        updateLocationButton();
+        state.skipAddrCorrection = false;
+        addrSuggestBanner.classList.remove("is-visible");
+        scheduleNeighborhoodDetect();
+      });
       addressInput.addEventListener("blur", () => {
         if (state.phase === "needs_location" && state.locationReq === "full_address" && addressInput.value.trim()) {
           setLocationError(validateAddress(addressInput.value));
         }
       });
 
+      addrSuggestAccept.addEventListener("click", () => {
+        const addr = addrSuggestBanner.dataset.suggestedAddress;
+        const bor  = addrSuggestBanner.dataset.suggestedBorough;
+        addrSuggestBanner.classList.remove("is-visible");
+        if (addr) addressInput.value = addr;
+        if (bor && boroughSelect.querySelector(`option[value="${bor}"]`)) boroughSelect.value = bor;
+        scheduleNeighborhoodDetect();
+        formEl.requestSubmit();
+      });
+
+      addrSuggestDecline.addEventListener("click", () => {
+        addrSuggestBanner.classList.remove("is-visible");
+        formEl.requestSubmit();
+      });
+
       demoButton.addEventListener("click", () => { if (!state.demo) enterDemoMode(); });
       document.querySelector("#demo-exit-btn").addEventListener("click", exitDemoMode);
       document.querySelector("#demo-own-btn").addEventListener("click", exitDemoMode);
+
+      langSelect.addEventListener("change", () => {
+        state.lang = langSelect.value;
+        applyTranslations();
+        loadExamples();
+      });
 
       formEl.addEventListener("submit", async (event) => {
         event.preventDefault();
@@ -1269,15 +1663,42 @@
             const addrErr = validateAddress(addressInput.value);
             if (addrErr) { setLocationError(addrErr); return; }
           }
-          if (!boroughSelect.value) { setLocationError("Please select a borough to continue"); return; }
+          if (!boroughSelect.value) { setLocationError(t("please_select_borough")); return; }
+
+          // Layer 3: Claude address correction (runs once per address attempt)
+          if (state.locationReq === "full_address" && !state.skipAddrCorrection) {
+            state.skipAddrCorrection = true;
+            submitButton.disabled = true;
+            submitButton.textContent = t("analyzing");
+            const correction = await correctAddress(addressInput.value.trim(), boroughSelect.value);
+            submitButton.disabled = false;
+            submitButton.textContent = t("get_results");
+            if (correction) {
+              if (correction.correction_made && correction.suggested_address) {
+                addrSuggestMsg.textContent = `Did you mean: ${correction.suggested_address}, ${correction.suggested_borough || boroughSelect.value}?`;
+                addrSuggestBanner.dataset.suggestedAddress = correction.suggested_address;
+                addrSuggestBanner.dataset.suggestedBorough = correction.suggested_borough || boroughSelect.value;
+                addrSuggestBanner.classList.add("is-visible");
+                return;
+              }
+              if (correction.likely_valid === false && !correction.correction_made) {
+                setLocationError("We couldn't find this address in NYC. Please check the street number and name and try again. Example: 280 Nostrand Avenue, Brooklyn");
+                state.skipAddrCorrection = false;
+                return;
+              }
+            }
+          }
+
           const rawAddr = addressInput.value.trim();
+          const borough = boroughSelect.value;
           const location = {
             address: rawAddr ? normalizeAddress(rawAddr) : null,
-            borough: boroughSelect.value || null
+            borough: borough || null,
+            ...(state.neighborhood ? { neighborhood: state.neighborhood.neighborhood, community_board: state.neighborhood.community_board, precinct: state.neighborhood.precinct } : {})
           };
           state.phase = "optimizing";
           submitButton.disabled = true;
-          submitButton.textContent = "Optimizing...";
+          submitButton.textContent = t("optimizing");
           await runOptimize(state.pendingInput, state.tone, location);
           return;
         }
@@ -1288,14 +1709,14 @@
         state.phase = "classifying";
         state.pendingInput = input;
         submitButton.disabled = true;
-        submitButton.textContent = "Analyzing...";
+        submitButton.textContent = t("analyzing");
         inputEl.disabled = true;
 
         try {
           const { location_requirement } = await classifyLocation(input);
           if (!location_requirement || location_requirement === "none") {
             state.phase = "optimizing";
-            submitButton.textContent = "Optimizing...";
+            submitButton.textContent = t("optimizing");
             await runOptimize(input, state.tone);
           } else {
             state.phase = "needs_location";
@@ -1303,9 +1724,20 @@
           }
         } catch {
           resetForm();
-          setError("Something went wrong — try rephrasing your complaint");
+          setError(t("error_generic"));
         }
       });
+
+      // Feature 1 Step 1: set language from browser preference on first load
+      (function detectBrowserLang() {
+        const bl = (navigator.language || navigator.userLanguage || "en").toLowerCase();
+        const mapped = bl.startsWith("es") ? "es" : bl.startsWith("zh") ? "zh" : bl.startsWith("ru") ? "ru" : "en";
+        if (mapped !== "en" && TRANSLATIONS[mapped]) {
+          state.lang = mapped;
+          langSelect.value = mapped;
+          applyTranslations();
+        }
+      })();
 
       loadExamples();
     </script>
