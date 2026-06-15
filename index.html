@@ -470,6 +470,228 @@
         text-decoration: underline;
       }
 
+      .header-right {
+        display: flex;
+        align-items: center;
+        flex-shrink: 0;
+      }
+
+      .or-divider {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin: 4px 0;
+        color: var(--muted);
+        font-size: 0.82rem;
+      }
+
+      .or-divider::before,
+      .or-divider::after {
+        content: "";
+        flex: 1;
+        height: 1px;
+        background: var(--line);
+      }
+
+      .demo-button {
+        width: 100%;
+        min-height: 42px;
+        padding: 9px 18px;
+        border: 1px solid var(--city-blue);
+        border-radius: 8px;
+        background: transparent;
+        color: var(--city-blue);
+        font: inherit;
+        font-size: 0.95rem;
+        font-weight: 720;
+        cursor: pointer;
+        white-space: nowrap;
+        transition: background 140ms ease;
+      }
+
+      .demo-button:hover {
+        background: var(--blue-soft);
+      }
+
+      .demo-hint {
+        margin: 2px 0 0;
+        color: var(--muted);
+        font-size: 0.82rem;
+        text-align: center;
+      }
+
+      .demo-banner {
+        display: none;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin: -8px 0 20px;
+        padding: 10px 16px;
+        border: 1px solid #b8d8f0;
+        border-radius: 8px;
+        background: var(--blue-soft);
+        color: var(--city-blue);
+        font-size: 0.9rem;
+        font-weight: 680;
+      }
+
+      .demo-banner.is-visible {
+        display: flex;
+      }
+
+      .demo-banner-btns {
+        display: flex;
+        gap: 8px;
+        flex-shrink: 0;
+      }
+
+      .demo-exit-btn,
+      .demo-own-btn {
+        min-height: 34px;
+        padding: 5px 13px;
+        border-radius: 6px;
+        font: inherit;
+        font-size: 0.85rem;
+        font-weight: 720;
+        cursor: pointer;
+        white-space: nowrap;
+        transition: background 140ms ease, color 140ms ease;
+      }
+
+      .demo-exit-btn {
+        border: 1px solid var(--city-blue);
+        background: white;
+        color: var(--city-blue);
+      }
+
+      .demo-exit-btn:hover { background: #dbedf8; }
+
+      .demo-own-btn {
+        border: 1px solid var(--city-blue);
+        background: var(--city-blue);
+        color: white;
+      }
+
+      .demo-own-btn:hover { background: var(--blue-deep); }
+
+      .location-section {
+        display: none;
+        margin: 16px 0;
+        padding: 14px 16px;
+        border: 1px solid #c7d3df;
+        border-radius: 8px;
+        background: var(--blue-soft);
+      }
+
+      .location-section.is-visible {
+        display: block;
+        animation: slide-down 200ms ease;
+      }
+
+      @keyframes slide-down {
+        from { opacity: 0; transform: translateY(-6px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+
+      .location-label {
+        display: block;
+        margin: 0 0 12px;
+        color: var(--city-blue);
+        font-size: 0.9rem;
+        font-weight: 760;
+      }
+
+      .location-input,
+      .location-select {
+        display: block;
+        width: 100%;
+        border: 1px solid #c7d3df;
+        border-radius: 8px;
+        padding: 10px 12px;
+        color: var(--ink);
+        background: #fbfdff;
+        font: inherit;
+        outline: none;
+      }
+
+      .location-input {
+        margin-bottom: 10px;
+      }
+
+      .location-input:focus,
+      .location-select:focus {
+        border-color: var(--city-blue);
+        box-shadow: 0 0 0 4px rgba(21, 79, 134, 0.13);
+      }
+
+      .address-preview {
+        min-height: 18px;
+        margin: 5px 0 8px;
+        color: var(--city-blue);
+        font-size: 0.82rem;
+        font-weight: 680;
+      }
+
+      .location-error {
+        display: none;
+        margin: 4px 0 8px;
+        color: var(--red);
+        font-size: 0.85rem;
+        font-weight: 680;
+      }
+
+      .location-error.is-visible {
+        display: block;
+      }
+
+      textarea.demo-input,
+      .location-input.demo-input,
+      .location-select.demo-input {
+        background: var(--blue-soft) !important;
+        border-color: #b8d8f0;
+        cursor: default;
+      }
+
+      .tone-loading {
+        display: none;
+        margin-bottom: 12px;
+        padding: 8px 12px;
+        border-radius: 6px;
+        background: var(--blue-soft);
+        color: var(--city-blue);
+        font-size: 0.85rem;
+        font-weight: 680;
+        animation: pulse-fade 1s ease-in-out infinite alternate;
+      }
+
+      .tone-loading:not([hidden]) {
+        display: block;
+      }
+
+      @keyframes pulse-fade {
+        from { opacity: 0.55; }
+        to   { opacity: 1; }
+      }
+
+      .card-body.is-reoptimizing .complaint-box,
+      .card-body.is-reoptimizing .legal {
+        opacity: 0.38;
+        transition: opacity 160ms ease;
+      }
+
+      .tone-error {
+        display: none;
+        margin-top: 10px;
+        color: var(--red);
+        font-size: 0.85rem;
+        font-weight: 680;
+      }
+
+      .tone-error:not([hidden]) {
+        display: block;
+      }
+
       @media (max-width: 520px) {
         h1 {
           font-size: 2.25rem;
@@ -500,11 +722,21 @@
             <p class="tagline">Turn your frustration into action.</p>
           </div>
         </div>
-        <div class="status-pill" title="Runs in your browser with OpenAI when an API key is available">
-          <span class="dot" aria-hidden="true"></span>
-          AI-assisted civic filing
+        <div class="header-right">
+          <div class="status-pill">
+            <span class="dot" aria-hidden="true"></span>
+            AI-assisted civic filing
+          </div>
         </div>
       </header>
+
+      <div class="demo-banner" id="demo-banner">
+        <span>Demo Mode — showing a sample complaint end to end</span>
+        <div class="demo-banner-btns">
+          <button class="demo-exit-btn" id="demo-exit-btn" type="button">✕ Exit Demo</button>
+          <button class="demo-own-btn" id="demo-own-btn" type="button">Try Your Own Complaint →</button>
+        </div>
+      </div>
 
       <main>
         <section class="panel" aria-labelledby="optimizer-title">
@@ -523,11 +755,30 @@
               <button class="tone-button" type="button" data-tone="urgent" aria-pressed="false">Urgent</button>
             </div>
 
+            <div class="location-section" id="location-section">
+              <span class="location-label">We need a bit more info to route this correctly</span>
+              <input type="text" class="location-input" id="address-input" placeholder="Street address (e.g. 123 Atlantic Ave)" />
+              <div class="address-preview" id="address-preview"></div>
+              <div class="location-error" id="location-error" role="alert"></div>
+              <select class="location-select" id="borough-select">
+                <option value="">Select borough…</option>
+                <option value="Manhattan">Manhattan</option>
+                <option value="Brooklyn">Brooklyn</option>
+                <option value="Queens">Queens</option>
+                <option value="Bronx">Bronx</option>
+                <option value="Staten Island">Staten Island</option>
+              </select>
+            </div>
+
             <button class="primary" id="submit-button" type="submit">Optimize My Complaint</button>
             <p class="hint">
               The app returns a stronger complaint, the likely 311 category, responsible agency, legal note, and a direct filing link.
             </p>
             <div class="error" id="error" role="alert"></div>
+
+            <div class="or-divider">or</div>
+            <button class="demo-button" id="demo-button" type="button">▶ Try a Demo</button>
+            <p class="demo-hint">See how it works in 10 seconds — no typing required</p>
           </form>
         </section>
 
@@ -554,63 +805,118 @@
         DEFAULT: "https://portal.311.nyc.gov/"
       };
 
+      // Fix 1: pre-loaded examples include real NYC addresses, skipping Call 1
       const examples = [
-        { input: "My landlord hasn't fixed the heat in 2 weeks", tone: "firm" },
-        { input: "My neighbor plays loud music every night after midnight", tone: "urgent" },
-        { input: "There's a giant pothole on my street that damaged my car", tone: "polite" }
+        { input: "My landlord hasn't fixed the heat in 2 weeks", tone: "firm",   location: { address: "280 Nostrand Ave",   borough: "Brooklyn"  } },
+        { input: "My neighbor plays loud music every night after midnight",        tone: "urgent", location: { address: "170 Amsterdam Ave", borough: "Manhattan" } },
+        { input: "There's a giant pothole on my street that damaged my car",      tone: "polite", location: { address: "Queens Blvd",        borough: "Queens"    } }
       ];
 
-      const state = { tone: "firm", loading: false };
+      const DEMO_COMPLAINT = "My landlord has not provided heat for 3 weeks. The temperature in my apartment drops below 50°F at night. I have a 2-year-old child living here.";
+      const DEMO_ADDRESS   = "280 Nostrand Ave";
+      const DEMO_BOROUGH   = "Brooklyn";
+      const DEMO_TONE      = "firm";
+      const DEMO_FALLBACK  = {
+        rewritten:   "I am writing to formally report a heat violation at 280 Nostrand Ave, Brooklyn. My landlord has failed to provide adequate heat for three consecutive weeks, with nighttime temperatures falling below 50°F. This directly violates NYC Housing Maintenance Code §27-2029, which requires landlords to maintain a minimum temperature of 68°F between 6am-10pm and 62°F overnight from October 1 through May 31. A young child resides in this unit, making this an urgent health and safety matter requiring immediate corrective action.",
+        category:    "HEAT/HOT WATER",
+        agency:      "HPD",
+        agency_full: "NYC Housing Preservation and Development",
+        legal_note:  "Under NYC Admin Code §27-2029, landlords must restore heat within 24 hours of a violation notice or face fines of $250-$500 per day.",
+        likelihood:  "High"
+      };
 
-      const inputEl = document.querySelector("#complaint-input");
-      const formEl = document.querySelector("#complaint-form");
-      const resultsEl = document.querySelector("#results");
-      const submitButton = document.querySelector("#submit-button");
-      const errorEl = document.querySelector("#error");
-      const countEl = document.querySelector("#result-count");
-      const toneButtons = Array.from(document.querySelectorAll(".tone-button"));
+      // phase: "idle" | "classifying" | "needs_location" | "optimizing" | "tone-switching"
+      const state = { tone: "firm", phase: "idle", pendingInput: null, locationReq: null, demo: false, lastResult: null, demoCard: null };
+
+      const inputEl         = document.querySelector("#complaint-input");
+      const formEl          = document.querySelector("#complaint-form");
+      const resultsEl       = document.querySelector("#results");
+      const submitButton    = document.querySelector("#submit-button");
+      const errorEl         = document.querySelector("#error");
+      const countEl         = document.querySelector("#result-count");
+      const toneButtons     = Array.from(document.querySelectorAll(".tone-button"));
+      const locationSection = document.querySelector("#location-section");
+      const addressInput    = document.querySelector("#address-input");
+      const boroughSelect   = document.querySelector("#borough-select");
+      const addressPreview  = document.querySelector("#address-preview");
+      const locationError   = document.querySelector("#location-error");
+      const demoButton      = document.querySelector("#demo-button");
+      const demoBanner      = document.querySelector("#demo-banner");
 
       function setTone(tone) {
         state.tone = tone;
-        toneButtons.forEach((btn) => {
-          btn.setAttribute("aria-pressed", String(btn.dataset.tone === tone));
-        });
+        toneButtons.forEach((btn) => btn.setAttribute("aria-pressed", String(btn.dataset.tone === tone)));
       }
 
       function submitUrlFor(category = "") {
-        const normalized = category.toUpperCase();
-        if (SUBMIT_URLS[normalized]) return SUBMIT_URLS[normalized];
-        if (normalized.includes("HEAT") || normalized.includes("HOT WATER")) return SUBMIT_URLS["HEAT/HOT WATER"];
-        if (normalized.includes("NOISE")) return SUBMIT_URLS.NOISE;
-        if (normalized.includes("SANITATION") || normalized.includes("TRASH")) return SUBMIT_URLS.SANITATION;
-        if (normalized.includes("STREET") || normalized.includes("SIDEWALK") || normalized.includes("POTHOLE")) return SUBMIT_URLS["STREET/SIDEWALK"];
-        if (normalized.includes("CONSTRUCTION")) return SUBMIT_URLS.CONSTRUCTION;
+        const n = category.toUpperCase();
+        if (SUBMIT_URLS[n]) return SUBMIT_URLS[n];
+        if (n.includes("HEAT") || n.includes("HOT WATER")) return SUBMIT_URLS["HEAT/HOT WATER"];
+        if (n.includes("NOISE")) return SUBMIT_URLS.NOISE;
+        if (n.includes("SANITATION") || n.includes("TRASH")) return SUBMIT_URLS.SANITATION;
+        if (n.includes("STREET") || n.includes("SIDEWALK") || n.includes("POTHOLE")) return SUBMIT_URLS["STREET/SIDEWALK"];
+        if (n.includes("CONSTRUCTION")) return SUBMIT_URLS.CONSTRUCTION;
         return SUBMIT_URLS.DEFAULT;
       }
 
       function withSubmitUrl(result) {
         return {
           ...result,
-          category: result.category || "GENERAL 311 SERVICE REQUEST",
-          agency: result.agency || "311",
+          category:    result.category    || "GENERAL 311 SERVICE REQUEST",
+          agency:      result.agency      || "311",
           agency_full: result.agency_full || "NYC 311",
-          likelihood: result.likelihood || "Medium",
-          submit_url: submitUrlFor(result.category)
+          likelihood:  result.likelihood  || "Medium",
+          submit_url:  submitUrlFor(result.category)
         };
       }
 
-      async function optimizeComplaint(input, tone) {
-        const response = await fetch("/api/optimize", {
+      // Fix 3: client-side address normalization
+      function normalizeAddress(raw) {
+        let addr = raw.trim().replace(/\s+/g, " ").replace(/[,;.]+$/, "");
+        addr = addr.replace(/\b\w+/g, (w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase());
+        return addr
+          .replace(/\bSt\b/g, "Street")
+          .replace(/\bAve\b/g, "Avenue")
+          .replace(/\bBlvd\b/g, "Boulevard")
+          .replace(/\bRd\b/g, "Road")
+          .replace(/\bDr\b/g, "Drive")
+          .replace(/\bPl\b/g, "Place")
+          .replace(/\bCt\b/g, "Court")
+          .replace(/\bLn\b/g, "Lane");
+      }
+
+      // Fix 4: address validation
+      const REJECT_WORDS = new Set(["fake", "test", "asdf", "lorem", "example", "foo", "bar", "baz"]);
+      function validateAddress(address) {
+        const trimmed = address.trim();
+        const msg = "Please enter a valid NYC street address (e.g. 123 Atlantic Ave)";
+        if (!trimmed) return msg;
+        if (!/\d/.test(trimmed)) return msg;
+        if (!/\d+\s+[A-Za-z]/.test(trimmed)) return msg;
+        if (trimmed.toLowerCase().split(/\s+/).some((w) => REJECT_WORDS.has(w))) return msg;
+        return null;
+      }
+
+      async function classifyLocation(input) {
+        const res = await fetch("/api/optimize", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ input, tone })
+          body: JSON.stringify({ input, action: "classify_location" })
         });
+        if (!res.ok) throw new Error("Classification failed");
+        return res.json();
+      }
 
-        if (!response.ok) {
-          throw new Error("Something went wrong — try rephrasing your complaint");
-        }
-
-        const result = await response.json();
+      async function optimizeComplaint(input, tone, location = null) {
+        const body = { input, tone };
+        if (location) body.location = location;
+        const res = await fetch("/api/optimize", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body)
+        });
+        if (!res.ok) throw new Error("Something went wrong — try rephrasing your complaint");
+        const result = await res.json();
         if (result.error) throw new Error("Something went wrong — try rephrasing your complaint");
         return withSubmitUrl(result);
       }
@@ -626,9 +932,9 @@
       }
 
       function createSkeletonCard() {
-        const template = document.createElement("template");
-        template.innerHTML = skeletonMarkup().trim();
-        return template.content.firstElementChild;
+        const t = document.createElement("template");
+        t.innerHTML = skeletonMarkup().trim();
+        return t.content.firstElementChild;
       }
 
       function likelihoodClass(likelihood) {
@@ -637,16 +943,14 @@
 
       function escapeHtml(value) {
         return String(value ?? "")
-          .replace(/&/g, "&amp;")
-          .replace(/</g, "&lt;")
-          .replace(/>/g, "&gt;")
-          .replace(/"/g, "&quot;")
-          .replace(/'/g, "&#039;");
+          .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;").replace(/'/g, "&#039;");
       }
 
       function renderCard(result, sourceInput = "") {
         const article = document.createElement("article");
         article.className = "result-card";
+        article.dataset.rewritten = result.rewritten;
         article.innerHTML = `
           <div class="card-top">
             <div>
@@ -656,6 +960,7 @@
             <span class="likelihood ${likelihoodClass(result.likelihood)}">${escapeHtml(result.likelihood)} likelihood</span>
           </div>
           <div class="card-body">
+            <div class="tone-loading" hidden></div>
             ${sourceInput ? `<div class="section"><span class="section-label">Original Complaint</span><div>${escapeHtml(sourceInput)}</div></div>` : ""}
             <div class="section">
               <span class="section-label">Optimized Complaint</span>
@@ -669,16 +974,15 @@
               <a class="secondary" href="${result.submit_url}" target="_blank" rel="noreferrer">Submit to 311</a>
               <button class="copy" type="button">Copy Complaint</button>
             </div>
+            <div class="tone-error" hidden></div>
           </div>
         `;
-
-        article.querySelector(".copy").addEventListener("click", async (event) => {
-          const button = event.currentTarget;
-          await navigator.clipboard.writeText(result.rewritten);
-          button.textContent = "Copied";
-          window.setTimeout(() => { button.textContent = "Copy Complaint"; }, 1300);
+        article.querySelector(".copy").addEventListener("click", async (e) => {
+          const btn = e.currentTarget;
+          await navigator.clipboard.writeText(btn.closest(".result-card").dataset.rewritten);
+          btn.textContent = "Copied";
+          window.setTimeout(() => { btn.textContent = "Copy Complaint"; }, 1300);
         });
-
         return article;
       }
 
@@ -687,17 +991,138 @@
         errorEl.classList.toggle("is-visible", Boolean(message));
       }
 
+      function setLocationError(message) {
+        locationError.textContent = message || "";
+        locationError.classList.toggle("is-visible", Boolean(message));
+      }
+
+      function updateAddressPreview() {
+        if (state.locationReq !== "full_address") { addressPreview.textContent = ""; return; }
+        const raw     = addressInput.value.trim();
+        const borough = boroughSelect.value;
+        if (!raw || !borough || validateAddress(raw)) { addressPreview.textContent = ""; return; }
+        addressPreview.textContent = `We'll use: ${normalizeAddress(raw)}, ${borough}`;
+      }
+
+      function updateLocationButton() {
+        if (state.phase !== "needs_location") return;
+        const boroughOk = boroughSelect.value !== "";
+        let addrOk = true;
+        if (state.locationReq === "full_address") {
+          const raw = addressInput.value.trim();
+          addrOk = raw !== "" && validateAddress(raw) === null;
+        }
+        submitButton.disabled = !(boroughOk && addrOk);
+        updateAddressPreview();
+      }
+
+      function showLocationSection(req) {
+        state.locationReq = req;
+        setLocationError(null);
+        addressPreview.textContent = "";
+        if (req === "full_address") {
+          addressInput.style.display = "block";
+          addressInput.required = true;
+        } else {
+          addressInput.style.display = "none";
+          addressInput.required = false;
+        }
+        locationSection.classList.add("is-visible");
+        submitButton.textContent = "Get Results";
+        updateLocationButton();
+        if (req === "full_address") addressInput.focus();
+        else boroughSelect.focus();
+      }
+
+      function hideLocationSection() {
+        locationSection.classList.remove("is-visible");
+        addressInput.value = "";
+        boroughSelect.value = "";
+        addressInput.style.display = "none";
+        addressInput.required = false;
+        addressInput.readOnly = false;
+        addressInput.disabled = false;
+        addressInput.classList.remove("demo-input");
+        boroughSelect.disabled = false;
+        boroughSelect.classList.remove("demo-input");
+        addressPreview.textContent = "";
+        setLocationError(null);
+        state.locationReq = null;
+      }
+
+      function resetForm() {
+        hideLocationSection();
+        state.phase = "idle";
+        state.pendingInput = null;
+        inputEl.disabled = false;
+        inputEl.classList.remove("demo-input");
+        submitButton.disabled = false;
+        submitButton.textContent = "Optimize My Complaint";
+      }
+
+      async function runOptimize(input, tone, location = null) {
+        const skeleton = createSkeletonCard();
+        resultsEl.prepend(skeleton);
+        try {
+          const result = await optimizeComplaint(input, tone, location);
+          skeleton.remove();
+          const card = renderCard(result, input);
+          resultsEl.prepend(card);
+          countEl.textContent = `${resultsEl.querySelectorAll(".result-card").length} results shown`;
+          inputEl.value = "";
+          state.lastResult = { input, location, cardEl: card };
+        } catch {
+          skeleton.remove();
+          if (!state.demo) setError("Something went wrong — try rephrasing your complaint");
+        } finally {
+          resetForm();
+        }
+      }
+
+      async function switchTone(newTone) {
+        if (!state.lastResult || state.phase !== "idle" || newTone === state.tone) return;
+        setTone(newTone);
+
+        const { input, location, cardEl } = state.lastResult;
+        const cardBody      = cardEl.querySelector(".card-body");
+        const toneLoading   = cardEl.querySelector(".tone-loading");
+        const toneErrorEl   = cardEl.querySelector(".tone-error");
+        const complaintBox  = cardEl.querySelector(".complaint-box");
+        const legalEl       = cardEl.querySelector(".legal");
+        const likelihoodEl  = cardEl.querySelector(".likelihood");
+
+        toneLoading.textContent = `Re-optimizing for ${newTone} tone…`;
+        toneLoading.hidden = false;
+        toneErrorEl.hidden = true;
+        cardBody.classList.add("is-reoptimizing");
+        state.phase = "tone-switching";
+
+        try {
+          const result = await optimizeComplaint(input, newTone, location);
+          complaintBox.textContent = result.rewritten;
+          legalEl.textContent = result.legal_note;
+          likelihoodEl.textContent = `${result.likelihood} likelihood`;
+          likelihoodEl.className = `likelihood ${likelihoodClass(result.likelihood)}`;
+          cardEl.dataset.rewritten = result.rewritten;
+        } catch {
+          toneErrorEl.textContent = "Couldn't switch tone — try again";
+          toneErrorEl.hidden = false;
+        } finally {
+          toneLoading.hidden = true;
+          cardBody.classList.remove("is-reoptimizing");
+          state.phase = "idle";
+        }
+      }
+
       async function loadExamples() {
         resultsEl.innerHTML = Array.from({ length: 3 }, () => skeletonMarkup()).join("");
         countEl.textContent = "Optimizing examples...";
         try {
           const results = await Promise.all(
-            examples.map((ex) => optimizeComplaint(ex.input, ex.tone))
+            examples.map((ex) => optimizeComplaint(ex.input, ex.tone, ex.location))
           );
           resultsEl.innerHTML = "";
-          results.forEach((result, i) => {
-            resultsEl.appendChild(renderCard(result, examples[i].input));
-          });
+          results.forEach((result, i) => resultsEl.appendChild(renderCard(result, examples[i].input)));
           countEl.textContent = "3 examples loaded";
         } catch {
           resultsEl.innerHTML = `<p style="color:var(--red);padding:16px">Something went wrong loading examples — check your API key and try reloading.</p>`;
@@ -705,35 +1130,180 @@
         }
       }
 
-      toneButtons.forEach((btn) => {
-        btn.addEventListener("click", () => setTone(btn.dataset.tone));
-      });
+      async function enterDemoMode() {
+        if (state.phase !== "idle") return;
+        state.demo = true;
 
-      formEl.addEventListener("submit", async (event) => {
-        event.preventDefault();
-        setError(null);
-        const input = inputEl.value.trim();
-        if (!input) return;
+        demoButton.hidden = true;
+        demoBanner.classList.add("is-visible");
 
-        state.loading = true;
+        inputEl.value = DEMO_COMPLAINT;
+        inputEl.readOnly = true;
+        inputEl.classList.add("demo-input");
+
+        setTone(DEMO_TONE);
+
+        state.phase = "classifying";
+        state.pendingInput = DEMO_COMPLAINT;
         submitButton.disabled = true;
+        submitButton.textContent = "Analyzing...";
+
+        try { await classifyLocation(DEMO_COMPLAINT); } catch { /* ignored in demo */ }
+        if (!state.demo) return;
+
+        state.phase = "needs_location";
+        state.locationReq = "full_address";
+        addressInput.value = DEMO_ADDRESS;
+        addressInput.style.display = "block";
+        addressInput.readOnly = true;
+        addressInput.classList.add("demo-input");
+        boroughSelect.value = DEMO_BOROUGH;
+        boroughSelect.classList.add("demo-input");
+        locationSection.classList.add("is-visible");
+        updateAddressPreview();
+
+        state.phase = "optimizing";
         submitButton.textContent = "Optimizing...";
+
         const skeleton = createSkeletonCard();
         resultsEl.prepend(skeleton);
 
+        let card;
         try {
-          const result = await optimizeComplaint(input, state.tone);
+          const result = await optimizeComplaint(DEMO_COMPLAINT, DEMO_TONE, { address: DEMO_ADDRESS, borough: DEMO_BOROUGH });
+          if (!state.demo) { skeleton.remove(); return; }
           skeleton.remove();
-          resultsEl.prepend(renderCard(result, input));
-          countEl.textContent = `${resultsEl.querySelectorAll(".result-card").length} results shown`;
-          inputEl.value = "";
+          card = renderCard(result, DEMO_COMPLAINT);
         } catch {
+          if (!state.demo) { skeleton.remove(); return; }
           skeleton.remove();
+          card = renderCard(withSubmitUrl(DEMO_FALLBACK), DEMO_COMPLAINT);
+        }
+
+        resultsEl.prepend(card);
+        state.demoCard = card;
+        countEl.textContent = "Demo result shown";
+
+        state.phase = "idle";
+        submitButton.disabled = true;
+        submitButton.textContent = "Optimize My Complaint";
+      }
+
+      function silentExitDemo() {
+        if (!state.demo) return;
+        state.demo = false;
+
+        demoButton.hidden = false;
+        demoBanner.classList.remove("is-visible");
+
+        inputEl.value = "";
+        inputEl.readOnly = false;
+        inputEl.classList.remove("demo-input");
+        setTone("firm");
+
+        hideLocationSection();
+        setError(null);
+
+        state.phase = "idle";
+        state.pendingInput = null;
+        state.lastResult = null;
+        submitButton.disabled = false;
+        submitButton.textContent = "Optimize My Complaint";
+
+        inputEl.focus();
+      }
+
+      function exitDemoMode() {
+        const card = state.demoCard;
+        silentExitDemo();
+        if (card) card.remove();
+        state.demoCard = null;
+        countEl.textContent = resultsEl.querySelectorAll(".result-card").length
+          ? `${resultsEl.querySelectorAll(".result-card").length} results shown`
+          : "";
+      }
+
+      // Event listeners
+      toneButtons.forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const newTone = btn.dataset.tone;
+          if (state.demo) { silentExitDemo(); setTone(newTone); return; }
+          if (state.lastResult && state.phase === "idle") {
+            switchTone(newTone);
+          } else {
+            setTone(newTone);
+          }
+        });
+      });
+
+      inputEl.addEventListener("focus", () => { if (state.demo) silentExitDemo(); });
+
+      boroughSelect.addEventListener("change", () => {
+        if (state.demo) { silentExitDemo(); return; }
+        updateLocationButton();
+        setLocationError(null);
+      });
+
+      addressInput.addEventListener("focus", () => { if (state.demo) silentExitDemo(); });
+
+      addressInput.addEventListener("input", () => { setLocationError(null); updateLocationButton(); });
+
+      addressInput.addEventListener("blur", () => {
+        if (state.phase === "needs_location" && state.locationReq === "full_address" && addressInput.value.trim()) {
+          setLocationError(validateAddress(addressInput.value));
+        }
+      });
+
+      demoButton.addEventListener("click", () => { if (!state.demo) enterDemoMode(); });
+      document.querySelector("#demo-exit-btn").addEventListener("click", exitDemoMode);
+      document.querySelector("#demo-own-btn").addEventListener("click", exitDemoMode);
+
+      formEl.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        if (state.demo || state.phase === "tone-switching") return;
+        setError(null);
+        state.lastResult = null;
+
+        if (state.phase === "needs_location") {
+          if (state.locationReq === "full_address") {
+            const addrErr = validateAddress(addressInput.value);
+            if (addrErr) { setLocationError(addrErr); return; }
+          }
+          if (!boroughSelect.value) { setLocationError("Please select a borough to continue"); return; }
+          const rawAddr = addressInput.value.trim();
+          const location = {
+            address: rawAddr ? normalizeAddress(rawAddr) : null,
+            borough: boroughSelect.value || null
+          };
+          state.phase = "optimizing";
+          submitButton.disabled = true;
+          submitButton.textContent = "Optimizing...";
+          await runOptimize(state.pendingInput, state.tone, location);
+          return;
+        }
+
+        const input = inputEl.value.trim();
+        if (!input) return;
+
+        state.phase = "classifying";
+        state.pendingInput = input;
+        submitButton.disabled = true;
+        submitButton.textContent = "Analyzing...";
+        inputEl.disabled = true;
+
+        try {
+          const { location_requirement } = await classifyLocation(input);
+          if (!location_requirement || location_requirement === "none") {
+            state.phase = "optimizing";
+            submitButton.textContent = "Optimizing...";
+            await runOptimize(input, state.tone);
+          } else {
+            state.phase = "needs_location";
+            showLocationSection(location_requirement);
+          }
+        } catch {
+          resetForm();
           setError("Something went wrong — try rephrasing your complaint");
-        } finally {
-          state.loading = false;
-          submitButton.disabled = false;
-          submitButton.textContent = "Optimize My Complaint";
         }
       });
 
