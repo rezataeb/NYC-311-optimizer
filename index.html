@@ -21,6 +21,7 @@
         --yellow-bg: #fff3cf;
         --red: #b1322c;
         --red-bg: #fde8e6;
+        --gold: #FFCD00;
         --shadow: 0 18px 60px rgba(16, 32, 51, 0.13);
         font-family:
           Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
@@ -49,6 +50,51 @@
         color: inherit;
       }
 
+      .nav-band {
+        background: #002D72;
+        width: 100%;
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        padding: 0 32px;
+      }
+
+      .hero-band {
+        background: linear-gradient(140deg, #002D72 0%, #0042A8 100%);
+        width: 100%;
+      }
+
+      .hero {
+        display: flex;
+        align-items: center;
+        gap: 24px;
+        padding: 18px 32px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      }
+
+      .hero-headline {
+        margin: 0;
+        color: #fff;
+        font-size: 1.375rem;
+        font-weight: 800;
+        line-height: 1.15;
+        letter-spacing: -0.02em;
+      }
+
+      .hero-gold {
+        color: var(--gold);
+      }
+
+      .hero-sub {
+        margin: 0;
+        flex: 1;
+        color: rgba(255, 255, 255, 0.5);
+        font-size: 0.8125rem;
+        font-weight: 400;
+        line-height: 1.5;
+      }
+
       .app {
         width: min(1160px, calc(100% - 32px));
         margin: 0 auto;
@@ -60,7 +106,7 @@
         align-items: center;
         justify-content: space-between;
         gap: 24px;
-        padding: 18px 0 28px;
+        height: 60px;
       }
 
       .brand {
@@ -70,29 +116,37 @@
       }
 
       .seal {
-        display: grid;
-        width: 48px;
-        height: 48px;
-        place-items: center;
-        border: 2px solid var(--city-blue);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        width: 42px;
+        height: 42px;
         border-radius: 50%;
-        background: var(--paper);
-        color: var(--city-blue);
+        border: none;
+        background: var(--gold);
+        color: #002D72;
+        font-size: 11px;
         font-weight: 800;
-        letter-spacing: 0;
+        letter-spacing: -0.03em;
+        line-height: 1.15;
+        text-align: center;
+        flex-shrink: 0;
       }
 
       h1 {
         margin: 0;
-        font-size: clamp(2rem, 4.2vw, 4rem);
-        line-height: 1;
-        letter-spacing: 0;
+        color: #fff;
+        font-size: 17px;
+        font-weight: 800;
+        letter-spacing: -0.02em;
+        line-height: 1.1;
       }
 
       .tagline {
-        margin: 8px 0 0;
-        color: var(--muted);
-        font-size: 1.05rem;
+        margin: 1px 0 0;
+        color: rgba(255, 255, 255, 0.4);
+        font-size: 11px;
       }
 
       .status-pill {
@@ -152,7 +206,7 @@
 
       .panel {
         position: sticky;
-        top: 18px;
+        top: 78px;
         padding: 20px;
       }
 
@@ -486,6 +540,13 @@
       }
 
       @media (max-width: 860px) {
+        .hero {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 10px;
+          padding: 16px 20px;
+        }
+
         .app {
           width: min(100% - 22px, 720px);
           padding-top: 18px;
@@ -839,20 +900,16 @@
     </style>
   </head>
   <body>
-    <div class="app">
+    <div class="nav-band">
       <header>
         <div class="brand">
-          <div class="seal" aria-hidden="true">311</div>
+          <div class="seal" aria-hidden="true"><span>NYC</span><span>311</span></div>
           <div>
-            <h1>311 Complaint Optimizer</h1>
-            <p class="tagline">Turn your frustration into action.</p>
+            <h1>Complaint Optimizer</h1>
+            <p class="tagline">AI-assisted civic filing · New York City</p>
           </div>
         </div>
         <div class="header-right">
-          <div class="status-pill">
-            <span class="dot" aria-hidden="true"></span>
-            AI-assisted civic filing
-          </div>
           <select id="lang-select" class="lang-select" aria-label="Language">
             <option value="en">🇺🇸 English</option>
             <option value="es">🇪🇸 Español</option>
@@ -861,6 +918,14 @@
           </select>
         </div>
       </header>
+    </div>
+    <div class="hero-band">
+      <section class="hero">
+        <p class="hero-headline" id="hero-headline">Stop writing complaints <span class="hero-gold" id="hero-headline-gold">that get ignored.</span></p>
+        <p class="hero-sub" id="hero-sub">We rewrite your complaint into legally-grounded language, match it to the right agency, and hand you a direct link to file.</p>
+      </section>
+    </div>
+    <div class="app">
 
       <div class="demo-banner" id="demo-banner">
         <span>Demo Mode — showing a sample complaint end to end</span>
@@ -1020,6 +1085,12 @@
       }
 
       function applyTranslations() {
+        const heroHeadlineEl = document.querySelector("#hero-headline");
+        if (heroHeadlineEl) {
+          heroHeadlineEl.innerHTML = t("hero_headline_white") + ' <span class="hero-gold" id="hero-headline-gold">' + t("hero_headline_gold") + '</span>';
+        }
+        const heroSubEl = document.querySelector("#hero-sub");
+        if (heroSubEl) heroSubEl.textContent = t("hero_sub");
         document.querySelector("#complaint-label").textContent = t("label_complaint");
         inputEl.placeholder = t("placeholder");
         document.querySelector('[data-tone="polite"]').textContent = t("polite");
