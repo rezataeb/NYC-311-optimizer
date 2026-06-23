@@ -11,7 +11,7 @@ export const TRANSLATIONS = {
     optimizing:           "Optimizing...",
     try_demo:             "▶ Try a Demo",
     demo_hint:            "See how it works in 10 seconds — no typing required",
-    hint_text:            "The app returns a stronger complaint, the likely 311 category, responsible agency, legal note, and a direct filing link.",
+    hint_text:            "Returns a stronger complaint, the 311 category, responsible agency, legal note, and a direct filing link.",
     results_title:        "Ready-to-file examples",
     optimized_complaint:  "Optimized Complaint",
     legal_note:           "Legal Note",
