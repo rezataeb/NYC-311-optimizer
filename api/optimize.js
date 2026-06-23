@@ -202,6 +202,37 @@ Return this exact JSON and nothing else:
     if (langName) {
       console.log(`[api/optimize] lang=${language} | legal_note: ${String(result.legal_note ?? "").slice(0, 100)}`);
     }
+
+    // Translate category for display
+    if (langName && result.category) {
+      try {
+        const catRes = await fetch("https://api.anthropic.com/v1/messages", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "x-api-key": process.env.ANTHROPIC_API_KEY,
+            "anthropic-version": "2023-06-01"
+          },
+          body: JSON.stringify({
+            model: "claude-haiku-4-5-20251001",
+            max_tokens: 30,
+            messages: [{
+              role: "user",
+              content: `Translate this NYC 311 category name into ${langName}: "${result.category}"\nReturn only the translated text, nothing else.`
+            }]
+          })
+        });
+        const catStatus = catRes.status;
+        const catData = await catRes.json();
+        console.log(`[api/optimize] cat translate status=${catStatus} result=${JSON.stringify(catData.content?.[0])}`);
+        if (catRes.ok && catData.content?.[0]?.text) {
+          result.category_display = catData.content[0].text.trim();
+        }
+      } catch (e) {
+        console.log(`[api/optimize] cat translate error: ${e.message}`);
+      }
+    }
+
     res.status(200).json(result);
   } catch {
     res.status(500).json({ error: "Failed to parse model response" });

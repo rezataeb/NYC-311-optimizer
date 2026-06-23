@@ -1,5 +1,6 @@
 export const TRANSLATIONS = {
   en: {
+    panel_heading:        "Describe Your Problem",
     label_complaint:      "Describe your problem in plain English",
     placeholder:          "Example: The apartment has had no hot water for three days and the landlord has not responded.",
     polite:               "Polite",
@@ -40,6 +41,7 @@ export const TRANSLATIONS = {
     results_shown:        "results shown"
   },
   es: {
+    panel_heading:        "Describa Su Problema",
     label_complaint:      "Describa su problema en español",
     placeholder:          "Ejemplo: El apartamento lleva tres días sin agua caliente y el propietario no ha respondido.",
     polite:               "Cortés",
@@ -80,6 +82,7 @@ export const TRANSLATIONS = {
     results_shown:        "resultados mostrados"
   },
   zh: {
+    panel_heading:        "描述您的问题",
     label_complaint:      "请用中文描述您的问题",
     placeholder:          "例如：公寓已经三天没有热水，房东没有回应。",
     polite:               "礼貌",
@@ -120,6 +123,7 @@ export const TRANSLATIONS = {
     results_shown:        "个结果已显示"
   },
   ru: {
+    panel_heading:        "Опишите Вашу Проблему",
     label_complaint:      "Опишите вашу проблему по-русски",
     placeholder:          "Пример: В квартире три дня нет горячей воды, и арендодатель не отвечает.",
     polite:               "Вежливо",

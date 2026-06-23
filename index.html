@@ -1056,7 +1056,7 @@ footer a {
           <h2 class="sr-only" id="optimizer-title">Complaint optimizer form</h2>
           <form id="complaint-form">
             <div class="panel-top">
-              <div class="panel-heading">Describe Your Problem</div>
+              <div class="panel-heading" id="panel-heading">Describe Your Problem</div>
               <label class="sr-only" for="complaint-input" id="complaint-label">Describe your problem in plain English</label>
               <textarea
                 id="complaint-input"
@@ -1220,6 +1220,7 @@ footer a {
         }
         const heroSubEl = document.querySelector("#hero-sub");
         if (heroSubEl) heroSubEl.textContent = t("hero_sub");
+        document.querySelector("#panel-heading").textContent = t("panel_heading");
         document.querySelector("#complaint-label").textContent = t("label_complaint");
         inputEl.placeholder = t("placeholder");
         document.querySelector('[data-tone="polite"]').textContent = t("polite");
@@ -1370,7 +1371,7 @@ footer a {
         article.innerHTML = `
           <div class="card-top">
             <div>
-              <span class="category ${badgeCls}">${escapeHtml(result.category)}</span>
+              <span class="category ${badgeCls}">${escapeHtml(result.category_display || result.category)}</span>
               <p class="agency">${escapeHtml(result.agency)} · ${escapeHtml(result.agency_full)}</p>
               ${result.neighborhood ? `<p class="card-location">📍 ${escapeHtml(result.neighborhood)}, ${escapeHtml(result.card_borough || "")}</p>` : ""}
             </div>
@@ -1626,13 +1627,14 @@ footer a {
         const cardLang    = cardEl.dataset.cardLang || "en";
         const tl          = (key) => t(key, cardLang);
         const cardBody    = cardEl.querySelector(".card-body");
-        const toneLoading = cardEl.querySelector(".tone-loading");
-        const toneErrorEl = cardEl.querySelector(".tone-error");
-        const complaintBox= cardEl.querySelector(".complaint-box");
-        const legalEl     = cardEl.querySelector(".legal");
-        const likelihoodEl= cardEl.querySelector(".likelihood");
-        const summaryBox  = cardEl.querySelector(".user-summary-box");
-        const activeToggle= cardEl.querySelector(".lang-toggle-btn.active");
+        const toneLoading  = cardEl.querySelector(".tone-loading");
+        const toneErrorEl  = cardEl.querySelector(".tone-error");
+        const complaintBox = cardEl.querySelector(".complaint-box");
+        const legalEl      = cardEl.querySelector(".legal");
+        const likelihoodEl = cardEl.querySelector(".likelihood");
+        const categoryEl   = cardEl.querySelector(".category");
+        const summaryBox   = cardEl.querySelector(".user-summary-box");
+        const activeToggle = cardEl.querySelector(".lang-toggle-btn.active");
 
         toneLoading.textContent = `Re-optimizing for ${newTone} tone…`;
         toneLoading.hidden = false;
@@ -1658,6 +1660,9 @@ footer a {
           legalEl.textContent = result.legal_note;
           likelihoodEl.textContent = tl("likelihood_" + lk);
           likelihoodEl.className = `likelihood ${lk}`;
+          if (result.category_display && categoryEl) {
+            categoryEl.textContent = result.category_display;
+          }
 
           if (summaryBox && result.user_summary) {
             summaryBox.textContent = `${tl("what_we_filed")} ${result.user_summary}`;

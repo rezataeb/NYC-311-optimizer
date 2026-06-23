@@ -183,6 +183,23 @@ Return this exact JSON and nothing else:
                 if (langName) {
                   console.log(`[vite/optimize] lang=${language} | legal_note: ${String(parsed.legal_note ?? "").slice(0, 100)}`);
                 }
+
+                // Translate category for display in the user's language
+                if (langName && parsed.category) {
+                  try {
+                    const catUpstream = await callAnthropic(
+                      "You are a translator. Return only the translated text, nothing else.",
+                      `Translate this NYC 311 category name into ${langName}: "${parsed.category}"`,
+                      30
+                    );
+                    if (catUpstream.ok) {
+                      const catData = await catUpstream.json();
+                      parsed.category_display = catData.content[0].text.trim();
+                      console.log(`[vite/optimize] category_display (${language}): ${parsed.category_display}`);
+                    }
+                  } catch {}
+                }
+
                 return sendJson(200, parsed);
               } catch {
                 sendJson(500, { error: "Something went wrong — try rephrasing your complaint" });
