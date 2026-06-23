@@ -1335,14 +1335,39 @@ footer a {
         return null;
       }
 
-      async function classifyLocation(input) {
-        const body = { input, action: "classify_location" };
-        if (state.lang !== "en") body.language = state.lang;
-        const res = await fetch("/api/optimize", {
+      async function postJson(url, body, timeoutMs) {
+        const opts = {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(body)
-        });
+        };
+        if (!timeoutMs) return fetch(url, opts);
+        const controller = new AbortController();
+        const id = setTimeout(() => controller.abort(), timeoutMs);
+        try {
+          const res = await fetch(url, { ...opts, signal: controller.signal });
+          clearTimeout(id);
+          return res;
+        } catch (e) {
+          clearTimeout(id);
+          throw e.name === "AbortError" ? new Error("Request timed out — please try again") : e;
+        }
+      }
+
+      function validateComplaint(input) {
+        if (input.length < 10) return "Please describe your problem in a bit more detail.";
+        if (/^(.)\1*$/.test(input.replace(/\s/g, ""))) return "Please describe your problem in a bit more detail.";
+        const words = input.toLowerCase().split(/\s+/).filter(Boolean);
+        if (words.length > 0 && words.every(w => REJECT_WORDS.has(w) || /^\d+$/.test(w))) {
+          return "Please describe your problem in a bit more detail.";
+        }
+        return null;
+      }
+
+      async function classifyLocation(input) {
+        const body = { input, action: "classify_location" };
+        if (state.lang !== "en") body.language = state.lang;
+        const res = await postJson("/api/optimize", body, 15000);
         if (!res.ok) throw new Error("Classification failed");
         return res.json();
       }
@@ -1351,11 +1376,7 @@ footer a {
         const body = { input, tone };
         if (location) body.location = location;
         if (lang && lang !== "en") body.language = lang;
-        const res = await fetch("/api/optimize", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(body)
-        });
+        const res = await postJson("/api/optimize", body, 20000);
         if (!res.ok) throw new Error(t("error_generic"));
         const result = await res.json();
         if (result.error) throw new Error(t("error_generic"));
@@ -1653,9 +1674,9 @@ footer a {
           countEl.textContent = `${resultsEl.querySelectorAll(".result-card").length} ${t("results_shown")}`;
           inputEl.value = "";
           state.lastResult = { input, location, cardEl: card };
-        } catch {
+        } catch (e) {
           skeleton.remove();
-          if (!state.demo) setError(t("error_generic"));
+          if (!state.demo) setError(e?.message?.includes("timed out") ? e.message : t("error_generic"));
         } finally {
           resetForm();
         }
@@ -1930,10 +1951,17 @@ footer a {
             submitButton.disabled = false;
             submitButton.textContent = t("get_results");
             if (correction) {
-              if (correction.correction_made && correction.suggested_address) {
-                addrSuggestMsg.textContent = `Did you mean: ${correction.suggested_address}, ${correction.suggested_borough || boroughSelect.value}?`;
-                addrSuggestBanner.dataset.suggestedAddress = correction.suggested_address;
-                addrSuggestBanner.dataset.suggestedBorough = correction.suggested_borough || boroughSelect.value;
+              const hasBoroughMismatch = correction.borough_mismatch && correction.suggested_borough &&
+                correction.suggested_borough.toLowerCase() !== boroughSelect.value.toLowerCase();
+              const hasAddressCorrection = correction.correction_made && correction.suggested_address;
+              if (hasBoroughMismatch || hasAddressCorrection) {
+                const suggestedAddr = correction.suggested_address || addressInput.value.trim();
+                const suggestedBor  = correction.suggested_borough || boroughSelect.value;
+                addrSuggestMsg.textContent = (hasBoroughMismatch && !hasAddressCorrection)
+                  ? `This address is usually in ${suggestedBor}, not ${boroughSelect.value}. Use ${suggestedBor} instead?`
+                  : `Did you mean: ${suggestedAddr}, ${suggestedBor}?`;
+                addrSuggestBanner.dataset.suggestedAddress = suggestedAddr;
+                addrSuggestBanner.dataset.suggestedBorough = suggestedBor;
                 addrSuggestBanner.classList.add("is-visible");
                 return;
               }
@@ -1961,6 +1989,8 @@ footer a {
 
         const input = inputEl.value.trim();
         if (!input) return;
+        const complaintErr = validateComplaint(input);
+        if (complaintErr) { setError(complaintErr); return; }
 
         state.phase = "classifying";
         state.pendingInput = input;
@@ -1978,9 +2008,9 @@ footer a {
             state.phase = "needs_location";
             showLocationSection(location_requirement);
           }
-        } catch {
+        } catch (e) {
           resetForm();
-          setError(t("error_generic"));
+          setError(e?.message?.includes("timed out") ? e.message : t("error_generic"));
         }
       });
 

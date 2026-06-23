@@ -105,7 +105,7 @@ Return JSON only — no preamble, no markdown:
                   const borough = location?.borough || "";
                   const upstream = await callAnthropic(
                     "You are an NYC address expert. Return JSON only.",
-                    `The user entered this NYC address: ${input}${borough ? `, ${borough}` : ""}. Is this a valid NYC street address? If there is a small typo or abbreviation issue, suggest the most likely correct version.\nReturn JSON: { "likely_valid": true or false, "suggested_address": "...", "suggested_borough": "...", "correction_made": true or false, "correction_explanation": "..." }`,
+                    `The user entered this NYC address: ${input}${borough ? `, ${borough}` : ""}. Is this a valid NYC street address? If there is a small typo or abbreviation issue, suggest the most likely correct version. Also check whether this street address is consistent with the selected borough — if the address is more commonly found in a different NYC borough, flag this as a borough mismatch and suggest the correct borough.\nReturn JSON: { "likely_valid": true or false, "suggested_address": "...", "suggested_borough": "...", "correction_made": true or false, "borough_mismatch": true or false, "correction_explanation": "..." }`,
                     200
                   );
                   try { return sendJson(200, await parseResponse(upstream)); }
