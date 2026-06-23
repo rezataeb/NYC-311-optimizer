@@ -535,6 +535,9 @@
         font-size: 0.88rem;
         line-height: 1.45;
       }
+      .user-summary-text {
+        margin: 0;
+      }
 
       .legal {
         background: #FFF8E0;
@@ -1393,7 +1396,7 @@ footer a {
               <span class="section-label">${escapeHtml(tl("legal_note"))}</span>
               <div class="legal">${escapeHtml(result.legal_note)}</div>
             </div>
-            ${hasLocalContent ? `<div class="user-summary-box">${escapeHtml(tl("what_we_filed"))} ${escapeHtml(result.user_summary)}</div>` : ""}
+            ${hasLocalContent ? `<div class="user-summary-box"><span class="section-label">${escapeHtml(tl("what_we_filed_label"))}</span><p class="user-summary-text">${escapeHtml(result.user_summary)}</p></div>` : ""}
             <div class="tone-error" hidden></div>
           </div>
           <div class="actions">
@@ -1634,6 +1637,7 @@ footer a {
         const likelihoodEl = cardEl.querySelector(".likelihood");
         const categoryEl   = cardEl.querySelector(".category");
         const summaryBox   = cardEl.querySelector(".user-summary-box");
+        const summaryText  = cardEl.querySelector(".user-summary-text");
         const activeToggle = cardEl.querySelector(".lang-toggle-btn.active");
 
         toneLoading.textContent = `Re-optimizing for ${newTone} tone…`;
@@ -1664,8 +1668,8 @@ footer a {
             categoryEl.textContent = result.category_display;
           }
 
-          if (summaryBox && result.user_summary) {
-            summaryBox.textContent = `${tl("what_we_filed")} ${result.user_summary}`;
+          if (summaryText && result.user_summary) {
+            summaryText.textContent = result.user_summary;
           }
         } catch {
           toneErrorEl.textContent = tl("error_tone_switch");
