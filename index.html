@@ -692,6 +692,12 @@
         margin-top: 2px;
       }
 
+      .footer-links {
+        display: flex;
+        gap: 20px;
+        align-items: center;
+      }
+
 footer a {
         font-size: 12.5px;
         color: rgba(255, 255, 255, 0.42);
@@ -1078,7 +1084,7 @@ footer a {
               </div>
 
               <div>
-                <div class="tone-label">Tone</div>
+                <div class="tone-label" id="tone-label">Tone</div>
                 <div class="tone-row" role="group" aria-label="Tone selector">
                   <button class="tone-button" type="button" data-tone="polite" aria-pressed="false">Polite</button>
                   <button class="tone-button" type="button" data-tone="firm" aria-pressed="true">Firm</button>
@@ -1134,10 +1140,14 @@ footer a {
         <div class="footer-seal" aria-hidden="true"><span>NYC</span><span>311</span></div>
         <div>
           <div class="footer-name">Complaint Optimizer</div>
-          <div class="footer-tagline">Built by Reza Taeb · No login required · Open source · Free</div>
+          <div class="footer-tagline" id="footer-tagline">Built by Reza Taeb · No login required · Open source · Free</div>
         </div>
       </div>
-<a href="https://github.com/rezataeb/NYC-311-optimizer" target="_blank" rel="noopener">GitHub</a>
+      <div class="footer-links">
+        <a href="https://github.com/rezataeb/NYC-311-optimizer" target="_blank" rel="noopener">GitHub</a>
+        <a href="https://www.linkedin.com/in/reza-taeb/" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="mailto:taeb.reza@gmail.com">Email</a>
+      </div>
     </footer>
 
     <script type="module">
@@ -1233,6 +1243,8 @@ footer a {
         document.querySelector("#demo-hint").textContent  = t("demo_hint");
         document.querySelector("#hint-text").textContent  = t("hint_text");
         document.querySelector("#results-title").textContent = t("results_title");
+        document.querySelector("#tone-label").textContent    = t("tone_label");
+        document.querySelector("#footer-tagline").textContent = t("footer_tagline");
         // Re-format the result count in the new language if cards are visible
         const cardCount = resultsEl.querySelectorAll(".result-card").length;
         if (cardCount > 0) {

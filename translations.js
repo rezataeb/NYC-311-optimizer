@@ -39,6 +39,8 @@ export const TRANSLATIONS = {
     optimizing_examples:  "Optimizing examples...",
     results_loaded:       "3 examples loaded",
     demo_result:          "Demo result shown",
+    tone_label:           "Tone",
+    footer_tagline:       "Built by Reza Taeb · No login required · Open source · Free",
     results_shown:        "results shown"
   },
   es: {
@@ -81,6 +83,8 @@ export const TRANSLATIONS = {
     optimizing_examples:  "Optimizando ejemplos...",
     results_loaded:       "3 ejemplos cargados",
     demo_result:          "Resultado de demostración mostrado",
+    tone_label:           "TONO",
+    footer_tagline:       "Creado por Reza Taeb · Sin necesidad de cuenta · Código abierto · Gratis",
     results_shown:        "resultados mostrados"
   },
   zh: {
@@ -123,6 +127,8 @@ export const TRANSLATIONS = {
     optimizing_examples:  "优化示例中...",
     results_loaded:       "已加载3个示例",
     demo_result:          "演示结果已显示",
+    tone_label:           "语气",
+    footer_tagline:       "由 Reza Taeb 创建 · 无需登录 · 开源 · 免费",
     results_shown:        "个结果已显示"
   },
   ru: {
@@ -165,6 +171,8 @@ export const TRANSLATIONS = {
     optimizing_examples:  "Оптимизация примеров...",
     results_loaded:       "3 примера загружено",
     demo_result:          "Результат демонстрации показан",
+    tone_label:           "ТОН",
+    footer_tagline:       "Создано Reza Taeb · Без регистрации · Открытый исходный код · Бесплатно",
     results_shown:        "результатов показано"
   }
 };
