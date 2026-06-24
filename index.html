@@ -1325,6 +1325,16 @@ footer a {
       }
 
       const REJECT_WORDS = new Set(["fake", "test", "asdf", "lorem", "example", "foo", "bar", "baz", "qwerty", "xxx", "none", "000"]);
+
+      function normalizeBorough(raw) {
+        const s = String(raw || "").toLowerCase().trim();
+        if (s === "manhattan" || s === "new york" || s === "new york city") return "manhattan";
+        if (s === "brooklyn"  || s === "kings"    || s === "kings county")  return "brooklyn";
+        if (s === "queens"    || s === "queens county")                      return "queens";
+        if (s === "bronx"     || s === "the bronx")                          return "bronx";
+        if (s === "staten island" || s === "richmond" || s === "richmond county") return "staten island";
+        return s;
+      }
       function validateAddress(address) {
         const trimmed = address.trim();
         const msg = t("error_address");
@@ -1565,6 +1575,18 @@ footer a {
           state.neighborhood = result;
           const cbText = result.community_board ? ` — Community Board ${result.community_board}` : "";
           neighborhoodInfo.textContent = `📍 ${result.neighborhood}, ${borough2}${cbText}`;
+
+          // Borough mismatch: compare what the model says the address's borough is vs what the user selected
+          if (result.borough && state.phase === "needs_location") {
+            const detectedBor = normalizeBorough(result.borough);
+            const selectedBor = normalizeBorough(borough2);
+            if (detectedBor && detectedBor !== selectedBor) {
+              addrSuggestMsg.textContent = `This address is usually in ${result.borough}, not ${borough2}. Use ${result.borough} instead?`;
+              addrSuggestBanner.dataset.suggestedAddress = addr2;
+              addrSuggestBanner.dataset.suggestedBorough = result.borough;
+              addrSuggestBanner.classList.add("is-visible");
+            }
+          }
         }, 500);
       }
 
@@ -1951,16 +1973,10 @@ footer a {
             submitButton.disabled = false;
             submitButton.textContent = t("get_results");
             if (correction) {
-              const hasBoroughMismatch = correction.borough_mismatch && correction.suggested_borough &&
-                correction.suggested_borough.toLowerCase() !== boroughSelect.value.toLowerCase();
-              const hasAddressCorrection = correction.correction_made && correction.suggested_address;
-              if (hasBoroughMismatch || hasAddressCorrection) {
-                const suggestedAddr = correction.suggested_address || addressInput.value.trim();
-                const suggestedBor  = correction.suggested_borough || boroughSelect.value;
-                addrSuggestMsg.textContent = (hasBoroughMismatch && !hasAddressCorrection)
-                  ? `This address is usually in ${suggestedBor}, not ${boroughSelect.value}. Use ${suggestedBor} instead?`
-                  : `Did you mean: ${suggestedAddr}, ${suggestedBor}?`;
-                addrSuggestBanner.dataset.suggestedAddress = suggestedAddr;
+              if (correction.correction_made && correction.suggested_address) {
+                const suggestedBor = correction.suggested_borough || boroughSelect.value;
+                addrSuggestMsg.textContent = `Did you mean: ${correction.suggested_address}, ${suggestedBor}?`;
+                addrSuggestBanner.dataset.suggestedAddress = correction.suggested_address;
                 addrSuggestBanner.dataset.suggestedBorough = suggestedBor;
                 addrSuggestBanner.classList.add("is-visible");
                 return;
