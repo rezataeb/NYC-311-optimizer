@@ -170,22 +170,40 @@
         background: var(--green);
       }
 
-      .lang-select {
-        height: 36px;
-        padding: 4px 10px;
-        border: 1px solid var(--line);
-        border-radius: 999px;
-        background: rgba(255, 255, 255, 0.78);
-        color: var(--muted);
-        font: inherit;
-        font-size: 0.88rem;
-        cursor: pointer;
-        outline: none;
-        margin-left: 10px;
+      .lang-flags {
+        display: flex;
+        align-items: center;
+        gap: 2px;
       }
 
-      .lang-select:focus {
-        border-color: var(--city-blue);
+      .lang-flag {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 44px;
+        height: 44px;
+        padding: 0;
+        border: none;
+        border-bottom: 2px solid transparent;
+        background: transparent;
+        font-size: 20px;
+        cursor: pointer;
+        line-height: 1;
+        transition: opacity 140ms ease;
+        border-radius: 2px;
+      }
+
+      .lang-flag[aria-pressed="true"] {
+        opacity: 1;
+        border-bottom-color: #FFCD00;
+      }
+
+      .lang-flag:not([aria-pressed="true"]) {
+        opacity: 0.35;
+      }
+
+      .lang-flag:not([aria-pressed="true"]):hover {
+        opacity: 0.65;
       }
 
       main {
@@ -1062,12 +1080,18 @@ footer a {
           </div>
         </div>
         <div class="header-right">
-          <select id="lang-select" class="lang-select" aria-label="Language">
-            <option value="en">🇺🇸 English</option>
-            <option value="es">🇪🇸 Español</option>
-            <option value="zh">🇨🇳 中文</option>
-            <option value="ru">🇷🇺 Русский</option>
+          <select id="lang-select" aria-hidden="true" tabindex="-1" style="display:none">
+            <option value="en">English</option>
+            <option value="es">Español</option>
+            <option value="zh">中文</option>
+            <option value="ru">Русский</option>
           </select>
+          <div class="lang-flags" role="group" aria-label="Language">
+            <button class="lang-flag" type="button" data-lang="en" aria-label="English" aria-pressed="true">🇺🇸</button>
+            <button class="lang-flag" type="button" data-lang="es" aria-label="Switch to Spanish" aria-pressed="false">🇵🇷</button>
+            <button class="lang-flag" type="button" data-lang="zh" aria-label="Switch to Mandarin" aria-pressed="false">🇨🇳</button>
+            <button class="lang-flag" type="button" data-lang="ru" aria-label="Switch to Russian" aria-pressed="false">🇷🇺</button>
+          </div>
         </div>
       </header>
     </div>
@@ -1236,6 +1260,7 @@ footer a {
       const demoButton         = document.querySelector("#demo-button");
       const demoBanner         = document.querySelector("#demo-banner");
       const langSelect         = document.querySelector("#lang-select");
+      const langFlagButtons    = Array.from(document.querySelectorAll(".lang-flag"));
       const langDetectBanner   = document.querySelector("#lang-detect-banner");
       const langDetectMsg      = document.querySelector("#lang-detect-msg");
       const langDetectAccept   = document.querySelector("#lang-detect-accept");
@@ -1280,6 +1305,25 @@ footer a {
         if (state.phase === "idle") {
           submitButton.textContent = t("optimize_button");
         }
+      }
+
+      const LANG_FLAG_LABELS = { en: "English", es: "Spanish", zh: "Mandarin", ru: "Russian" };
+
+      function syncFlagButtons(lang) {
+        langFlagButtons.forEach(btn => {
+          const active = btn.dataset.lang === lang;
+          btn.setAttribute("aria-pressed", String(active));
+          btn.setAttribute("aria-label", active ? LANG_FLAG_LABELS[btn.dataset.lang] : `Switch to ${LANG_FLAG_LABELS[btn.dataset.lang]}`);
+        });
+      }
+
+      function setLanguage(lang) {
+        if (!TRANSLATIONS[lang]) return;
+        state.lang = lang;
+        langSelect.value = lang;
+        syncFlagButtons(lang);
+        applyTranslations();
+        loadExamples();
       }
 
       function setTone(tone) {
@@ -1891,12 +1935,7 @@ footer a {
 
       langDetectAccept.addEventListener("click", () => {
         const dl = langDetectAccept.dataset.lang;
-        if (dl && TRANSLATIONS[dl]) {
-          state.lang = dl;
-          langSelect.value = dl;
-          applyTranslations();
-          loadExamples();
-        }
+        if (dl) setLanguage(dl);
         hideLangDetectBanner();
       });
 
@@ -1945,10 +1984,8 @@ footer a {
       document.querySelector("#demo-exit-btn").addEventListener("click", exitDemoMode);
       document.querySelector("#demo-own-btn").addEventListener("click", exitDemoMode);
 
-      langSelect.addEventListener("change", () => {
-        state.lang = langSelect.value;
-        applyTranslations();
-        loadExamples();
+      langFlagButtons.forEach(btn => {
+        btn.addEventListener("click", () => setLanguage(btn.dataset.lang));
       });
 
       formEl.addEventListener("submit", async (event) => {
@@ -2037,6 +2074,7 @@ footer a {
         if (mapped !== "en" && TRANSLATIONS[mapped]) {
           state.lang = mapped;
           langSelect.value = mapped;
+          syncFlagButtons(mapped);
           applyTranslations();
         }
       })();
