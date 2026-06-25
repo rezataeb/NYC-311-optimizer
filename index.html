@@ -1223,11 +1223,44 @@ footer a {
 
       const LANG_NAMES = { en: "English", es: "Spanish", zh: "Mandarin Chinese", ru: "Russian" };
 
-      // Pre-loaded examples reload in the selected language when language changes
-      const examples = [
-        { input: "My landlord hasn't fixed the heat in 2 weeks", tone: "firm",   location: { address: "280 Nostrand Ave",   borough: "Brooklyn"  } },
-        { input: "My neighbor plays loud music every night after midnight",        tone: "urgent", location: { address: "170 Amsterdam Ave", borough: "Manhattan" } },
-        { input: "There's a giant pothole on my street that damaged my car",      tone: "polite", location: { address: "Queens Blvd",        borough: "Queens"    } }
+      // Static results for the 3 pre-loaded example cards — no API call on page load
+      const PRELOADED_EXAMPLES = [
+        {
+          input: "My landlord hasn't fixed the heat in 2 weeks",
+          tone:  "firm",
+          result: {
+            rewritten:   "My landlord has failed to provide adequate heat for 2 weeks at 280 Nostrand Ave, Williamsburg, Brooklyn, in violation of Housing Maintenance Code. The indoor temperature has dropped below the legally required 68°F during daytime hours and 62°F at night. This constitutes a serious habitability violation requiring immediate remediation. I demand the heat be restored to code-compliant levels without further delay.",
+            category:    "HEAT",
+            agency:      "HPD",
+            agency_full: "Department of Housing Preservation and Development",
+            legal_note:  "Landlords must provide heat at 68°F (daytime) and 62°F (night) during cold months; failure to do so within 24 hours of notice is a Class B violation under NYC Housing Maintenance Code.",
+            likelihood:  "High"
+          }
+        },
+        {
+          input: "My neighbor plays loud music every night after midnight",
+          tone:  "urgent",
+          result: {
+            rewritten:   "My neighbor at 170 Amsterdam Ave, Manhattan, plays loud music every night after midnight, constituting a noise violation under NYC Administrative Code § 24-218. The music is clearly audible in my apartment and disrupts sleep every evening after 10 PM, which violates the city's nighttime noise ordinance. This is ongoing harassment and a documented quality of life issue requiring immediate enforcement.",
+            category:    "NOISE - RESIDENTIAL",
+            agency:      "NYPD",
+            agency_full: "New York City Police Department",
+            legal_note:  "NYPD Precinct 24 must respond to noise complaints after 10 PM within the statutory response timeframe and issue citations under NYC Admin Code § 24-218 if violation is confirmed.",
+            likelihood:  "High"
+          }
+        },
+        {
+          input: "There's a giant pothole on my street that damaged my car",
+          tone:  "polite",
+          result: {
+            rewritten:   "There is a large pothole on Queens Boulevard in Queens that has caused significant damage to my vehicle. The pothole creates a serious hazard for all vehicles traveling on this road and poses a safety risk to pedestrians and cyclists. I request immediate inspection and repair of this road defect. Please provide a case number and estimated repair timeline.",
+            category:    "POTHOLE",
+            agency:      "DOT",
+            agency_full: "Department of Transportation",
+            legal_note:  "NYC Administrative Code § 7-210 requires DOT to repair potholes; DOT must respond to pothole complaints within 30 days and prioritize safety hazards.",
+            likelihood:  "High"
+          }
+        }
       ];
 
       // Demo complaints in each supported language
@@ -1818,20 +1851,12 @@ footer a {
         }
       }
 
-      async function loadExamples() {
-        resultsEl.innerHTML = Array.from({ length: 3 }, () => skeletonMarkup()).join("");
-        countEl.textContent = t("loading_examples");
-        try {
-          const results = await Promise.all(
-            examples.map((ex) => optimizeComplaint(ex.input, ex.tone, ex.location, state.lang))
-          );
-          resultsEl.innerHTML = "";
-          results.forEach((result, i) => resultsEl.appendChild(renderCard(result, examples[i].input, state.lang)));
-          countEl.textContent = t("results_loaded");
-        } catch {
-          resultsEl.innerHTML = `<p style="color:var(--red);padding:16px">${t("error_api_load")}</p>`;
-          countEl.textContent = "";
-        }
+      function loadExamples() {
+        resultsEl.innerHTML = "";
+        PRELOADED_EXAMPLES.forEach(ex => {
+          resultsEl.appendChild(renderCard(withSubmitUrl(ex.result), ex.input, state.lang));
+        });
+        countEl.textContent = t("results_loaded");
       }
 
       async function enterDemoMode() {
