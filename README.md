@@ -3,6 +3,7 @@
 Turn plain English frustrations into strong, legally grounded NYC 311 complaints — routed to the right agency with a direct filing link.
 
 **Live app:** https://nyc-311-optimizer.vercel.app  
+**Demo:** https://nyc-311-optimizer.netlify.app  
 **Repo:** https://github.com/rezataeb/NYC-311-optimizer
 
 ---
@@ -92,4 +93,4 @@ Open `http://localhost:5173`.
 
 ## Why This Exists
 
-Built as a civic tech portfolio project for an NYC gov/tech job search. The API key lives in Vercel's server environment and is never exposed in the browser bundle.
+Built as a civic tech portfolio project targeting NYC government and civic tech roles (OTI, NYC311, Nava, USDS, BetaNYC). The multilingual support is aligned with NYC Local Law 30, which requires city services in the top 10 languages. The API key lives in Vercel's server environment and is never exposed in the browser bundle.
